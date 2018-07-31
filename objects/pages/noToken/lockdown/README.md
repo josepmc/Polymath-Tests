@@ -1,0 +1,1 @@
+These pages are not having metamask connected.

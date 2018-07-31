@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/node_modules/@immoweb/protractor/bin/protractor",
+            "args": [
+                "${workspaceFolder}/protractor.conf.js",
+                "--troubleshoot"
+            ],
+            // Define here your environment variables (e.g. metamask secret & password)
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "node_modules/**/*",
+                "<node internals>/**/*"
+            ]
+        }
+    ]
+}

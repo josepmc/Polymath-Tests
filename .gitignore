@@ -1,0 +1,5 @@
+node_modules
+package-lock.json
+polymath2.png
+.env
+.DS_Store

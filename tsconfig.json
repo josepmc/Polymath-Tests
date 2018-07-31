@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "pretty": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "strict": false,
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./node_modules"
+        ],
+        "paths": {
+            "protractor": ["node_modules/@immoweb/protractor"],
+            "lib": ["node_modules/@immoweb/protractor", "lib"]
+        },
+        "types": [
+            "node",
+            "protractor"
+        ] 
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "compileOnSave": false
+}
