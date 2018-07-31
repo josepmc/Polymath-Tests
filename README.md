@@ -1,6 +1,6 @@
-# Dappeteer Test
+# Poly Tests
 
-This is a temporary repo for running automated tests with Puppeteer and Dappeteer
+These are the tests for the Poly Dapp Suite.
 
 ## Getting Started
 
@@ -14,20 +14,13 @@ These instructions will get you a copy of the project up and running on your loc
 ## Installation
 
 ```
-git clone git@github.com:josepmc/issuer-test.git [nameOfFolderOnLocalMachine]
+git clone git@github.com:josepmc/issuer-test.git
 $ yarn
-$ npm test
+$ env METAMASK_SECRET=<your secret> METAMASK_PASSWORD=<your password> GMAIL_USER=<your user> GMAIL_PASSWORD=<your password> npm test
 ```
-### Setup
-
-The code is already commented with step by step instructions. They are as follows:
-
-1. Add your 12-word mnemonic for an account that already has Kovan ETH
-2. Change network as necessary (Kovan is used at time of writing)
-3. Change url as necessary (tokenstudio.polymath.network/ticker)
-4. Change the Ticker Symbol for each test
 
 
 ## References
 
-* This repo uses the awesome automation tool dappeteer () together with puppeteer ()
+* This repo uses the decorators framework from [josepmc/protractor](https://github.com/josepmc/protractor)
+* You may need to use the app locally, but you can pretty much configure everything in config/base.ts
