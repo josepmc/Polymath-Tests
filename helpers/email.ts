@@ -1,14 +1,11 @@
-import { ImapSimpleOptions, ImapSimple, connect } from 'imap-simple';
+import { ImapSimple, connect } from 'imap-simple';
 import { FetchOptions, Config } from 'imap';
 import * as deasync from 'deasync';
 
 export class EmailHandler {
     private connection: ImapSimple;
     constructor(protected opts: Config) {
-        let self = this;
-        deasync(async () => {
-            self.connection = await connect({ imap: this.opts });
-        })();
+        this.connection = deasync(callback => connect({ imap: this.opts }).then(r => callback(null, r)))();
     }
     public async fetchTo(to: string): Promise<string[]> {
         let searchCriteria = [

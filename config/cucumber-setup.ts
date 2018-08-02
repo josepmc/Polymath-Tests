@@ -1,7 +1,6 @@
-import { After, HookScenarioResult, World, Status, setDefaultTimeout, Before, HookOptions } from 'cucumber';
+import { After, HookScenarioResult, World, Status, setDefaultTimeout, Before } from 'cucumber';
 import { oh } from 'framework/helpers';
-import { PuppeteerWrapper } from 'framework/object/wrapper/browser';
-import { Network } from 'framework/object/wrapper/puppeteer';
+import { Metamask, Network } from 'extensions/metamask';
 
 process.on('uncaughtException', function (err) {
     console.error((err && err.stack) ? err.stack : err);
@@ -18,9 +17,8 @@ Before(async function (this: World, scenario: HookScenarioResult) {
     let password = process.env.METAMASK_PASSWORD;
     if (!secret) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_SECRET' for the tests to work`;
     if (!password) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_PASSWORD' for the tests to work`;
-    let metamask = await (oh.browser as PuppeteerWrapper).handle.metamask;
-    await metamask.importAccount(secret, password);
-    await metamask.switchNetwork(Network.kovan);
+    await Metamask.instance.importAccount(secret, password);
+    await Metamask.instance.switchNetwork(Network.Kovan);
 });
 
 After(async function (this: World, scenario: HookScenarioResult) {

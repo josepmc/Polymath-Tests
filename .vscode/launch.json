@@ -11,14 +11,17 @@
             "program": "${workspaceFolder}/node_modules/@immoweb/protractor/bin/protractor",
             "args": [
                 "${workspaceFolder}/protractor.conf.js",
-                "--troubleshoot"
+                "--troubleshoot",
+                "--params.browser=puppeteer",
+                "--params.extensions=metamask"
             ],
             // Define here your environment variables (e.g. metamask secret & password)
             "envFile": "${workspaceFolder}/.env",
             "console": "integratedTerminal",
+            "stopOnEntry": false,
             "skipFiles": [
                 "node_modules/**/*",
-                "<node internals>/**/*"
+                "<node_internals>/**/*"
             ]
         }
     ]

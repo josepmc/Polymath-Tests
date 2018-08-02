@@ -3,7 +3,7 @@ import { Locator, By } from "framework/helpers";
 import { label } from "framework/object/core/decorators";
 
 export class Header extends AbstractFeature {
-    public featureSelector: Locator = By.xpath('.//*[@]');
+    public featureSelector: Locator = By.xpath('.//ul[[.//*[@alt="Active network"]]');
     @label<string>(By.xpath('.//li[.//*[@alt="Active network"]]')) public network: string;
     @label<number>(By.xpath('.//li[.//*[@alt="Your POLY balance"]]'), /(\d+)/) public poly: number;
     @label<string>(By.xpath('.//li[.//*[@alt="Account"]]')) public ethAddress: string;

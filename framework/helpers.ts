@@ -14,8 +14,15 @@ import { ByWrapper } from './object/wrapper/browser';
 export { LocatorCompare } from './object/shared';
 export { NumberRange } from './object/interfaces';
 export { ElementWrapper, WindowInfo } from './object/wrapper';
-export let oh = new ObjectHelper(helperBrowsers);
+export let oh: ObjectHelper = new ObjectHelper(() => helperBrowsers);
 export type Locator = WebdriverBy;
 export const Locator = WebdriverBy;
-export let By: ByWrapper = oh.By;
-export let by: ByWrapper = By;
+export let By: ByWrapper;
+export let by: ByWrapper;
+module.exports = {
+    ...module.exports,
+    get By(): Locator {
+        return (module.exports.oh && module.exports.oh.By) || null;
+    },
+    get by(): Locator { return By; }
+}

@@ -9,7 +9,6 @@ class SignTests {
     @given(/The issuer navigates to the issue url/)
     public async navigate() {
         let welcome = new Welcome();
-        debugger;
         await welcome.navigateToPage();
         await welcome.next();
     }

@@ -8,7 +8,8 @@ import { SignPage } from "objects/pages/noToken/sign/sign";
     constructor() {
         super(oh.browser.baseUrl);
     }
-    public next(): Promise<SignPage> {
-        return oh.click(this.element, By.xpath('.//button[text()="CREATE YOUR SECURITY TOKEN"]')).then(() => new SignPage().load());
+    public async next(): Promise<SignPage> {
+        await oh.click(By.xpath('.//button[text()="CREATE YOUR SECURITY TOKEN"]'));
+        return await new SignPage().load();
     }
 }

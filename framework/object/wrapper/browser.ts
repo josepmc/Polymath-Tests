@@ -567,7 +567,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
     }
 
     private async closeWindow(oldHandle: WindowInfo = null, timeout?: number): Promise<void> {
-        return this.waitForClose(async () => this.close(), oldHandle, timeout);
+        return this.waitForClose(async () => this.driver.close(), oldHandle, timeout);
     }
 
     private async waitForNewWindow<T>(openFn: () => Promise<T>, timeout: number = undefined): Promise<WindowInfo> {
@@ -589,8 +589,9 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
         let handleToChange = oldHandle || await this.defaultFrame();
         if (!closeFn) debugger; // We shouldn't get here
         await closeFn();
+        await this.driver.switchTo().window(handleToChange.windowHandle);
         ah = await this.waitFor(() => this.getAllWindowHandles()
-            .then(handles => handles.length < ah.length ? handles : null), `Timeout: Waiting for a new window to be opened`, timeout, timeout !== undefined);
+            .then(handles => handles.length < ah.length ? handles : null), `Timeout: Waiting for a new window to be closed`, timeout, timeout !== undefined);
         if (!ah) return null;
         await this.switchToFrame(handleToChange);
     }

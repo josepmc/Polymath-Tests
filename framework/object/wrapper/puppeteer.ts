@@ -1,50 +1,16 @@
 import * as puppeteer from 'puppeteer';
-import * as dapp from 'dappeteer';
 import deasync = require('deasync');
 import { randomBytes } from 'crypto';
 import { ISize } from 'selenium-webdriver';
 import * as tmp from 'tmp';
 import * as rimraf from 'rimraf';
-import { ProtractorBrowser } from '@immoweb/protractor/built';
-const dappeteer: Dappeteer = dapp;
-
-interface DappeteerOptions extends puppeteer.LaunchOptions {
-    metamaskPath?: string;
-    extensionUrl?: string;
-}
-
-export enum Network {
-    "main",
-    "ropsten",
-    "rinkeby",
-    "kovan",
-    "localhost"
-}
-
-interface TransactionOptions {
-    gas?: number;
-    gasLimit?: number;
-}
-
-export interface Metamask {
-    createAccount: (password?: string) => Promise<void>;
-    importAccount: (seed?: string, password?: string) => Promise<void>;
-    lock: () => Promise<void>;
-    unlock: (password?: string) => Promise<void>;
-    switchNetwork: (networkName?: Network) => Promise<void>;
-    confirmTransaction: (transactionOpts?: TransactionOptions) => Promise<void>;
-}
-
-interface Dappeteer {
-    launch: (puppeteer, launchOptions: DappeteerOptions) => Promise<puppeteer.Browser>;
-    getMetamask: (browser: puppeteer.Browser) => Promise<Metamask>;
-}
+import { ProtractorBrowser } from 'protractor';
 
 export interface PuppeteerOptions {
     headless?: boolean;
     launchArgs?: string[];
     userDataDir?: string;
-    useDapp?: boolean;
+    extensions?: string[];
 }
 
 // Eventually we need to move towards a multiple extensions model
@@ -97,16 +63,17 @@ export class PuppeteerHandle {
         return found;
     }
     private static createInstance(options: PuppeteerOptions): puppeteer.Browser {
-        let launch = options.useDapp ? (opts) => dappeteer.launch(puppeteer, opts) : puppeteer.launch;
         let opts = {
             headless: options.headless,
             ignoreHTTPSErrors: true,
             userDataDir: options.userDataDir,
-            args: [].concat(options.launchArgs),
+            args: (puppeteer as any).defaultArgs().filter(arg => arg !== '--disable-extensions')
+                .concat(options.launchArgs),
+            ignoreDefaultArgs: true
         };
         return deasync(callback => {
             let tries = 0;
-            let fn = () => launch(opts).then(res => callback(null, res)).catch(err => {
+            let fn = () => puppeteer.launch(opts).then(res => callback(null, res)).catch(err => {
                 if (tries < 10) return fn();
                 else callback(err);
             });
@@ -120,23 +87,10 @@ export class PuppeteerHandle {
                 '--no-sandbox',
                 '--no-proxy-server',
                 '--ignore-certificate-errors',
-                '--disable-background-networking',
-                '--disable-client-side-phishing-detection',
-                '--disable-default-apps',
-                '--disable-hang-monitor',
-                '--disable-popup-blocking',
-                '--disable-prompt-on-repost',
-                '--disable-sync',
-                '--disable-web-resources',
-                '--enable-automation',
                 '--enable-logging',
                 '--force-fieldtrials=SiteIsolationExtensions/Control',
                 '--log-level=0',
-                '--metrics-recording-only',
-                '--no-first-run',
-                '--password-store=basic',
                 '--test-type=webdriver',
-                '--use-mock-keychain',
             ];
         if (!this.options.userDataDir) {
             this.tmpDirHandle = tmp.dirSync({ prefix: 'puppeteer' });
@@ -154,6 +108,10 @@ export class PuppeteerHandle {
         else {
             let res = /--window-size=(\d+),(\d+)/.exec(ws);
             if (res) this._size = { width: parseInt(res[1]), height: parseInt(res[2]) };
+        }
+        if (this.options.extensions) {
+            for (let extension of this.options.extensions)
+                this.options.launchArgs.push(`--load-extension=${extension}`);
         }
         this.browser = PuppeteerHandle.createInstance(this.options);
         console.log(`Puppeteer: Started! You can connect using devtools on the following address: ${this.address}`);
@@ -179,18 +137,9 @@ export class PuppeteerHandle {
             this.options.userDataDir = this.tmpDirHandle.name;
         }
         let idx = this.options.launchArgs.findIndex(el => el.startsWith('--remote-debugging-port'));
-        if (idx >= 0) this.options.launchArgs.splice(idx, 1);
+        if (idx > 0) this.options.launchArgs.splice(idx, 1);
         this.options.launchArgs = this.options.launchArgs.concat(`--remote-debugging-port=${this.debuggerPort}`)
         this.browser = PuppeteerHandle.createInstance(this.options);
         console.log(`Chrome Headless - Restarted, available on ${this.address}`);
-    }
-    private async getMetmask(): Promise<Metamask> {
-        let metamask = await dappeteer.getMetamask(this.browser);
-        let oldMethod = metamask.switchNetwork;
-        metamask.switchNetwork = input => Number.isNaN(input) ? oldMethod(input) : oldMethod(Network[input] as any);
-        return metamask;
-    }
-    public get metamask(): Promise<Metamask> {
-        return this.options.useDapp ? this.getMetmask() : new Promise(r => r(null));
     }
 }

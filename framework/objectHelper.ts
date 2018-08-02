@@ -17,19 +17,33 @@ export interface HighlightOpts {
 }
 
 export class ObjectHelper {
-    public browser: BrowserWrapper;
+    private _browser: BrowserWrapper;
+    public set browser(val: BrowserWrapper) {
+        this._browser = val;
+    }
+    public get browser(): BrowserWrapper {
+        if (!this.hasInit) this.init();
+        return this._browser;
+    }
     public chance: DataGenerator;
     public alert: Alert;
     public triggeredBrowsers: BrowserWrapper[];
-    constructor(browsers: ProtractorBrowser[]) {
+    private hasInit = false;
+    private init(browsers: ProtractorBrowser[] = this.initFn()) {
+        if (!browsers) return;
+        this.hasInit = true;
         this.triggeredBrowsers = browsers.map(BrowserWrapper.create);
         this.browser = this.triggeredBrowsers.find(browser => !browser.helper);
         this.chance = new (GetGenerator(GeneratorBackend.Chance))(this.browser.params && this.browser.params.generatorSeed);
         this.alert = new Alert(this);
+        TestConfig.instance; // Register the instance
+    }
+    constructor(private initFn: () => ProtractorBrowser[]) {
+        this.init(initFn());
     }
 
     public get By(): ByWrapper {
-        return this.browser.By;
+        return this.browser && this.browser.By;
     }
 
     public setBrowser(browser: BrowserWrapper) {

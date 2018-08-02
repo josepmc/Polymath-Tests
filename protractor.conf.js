@@ -1,6 +1,6 @@
 let baseConfig = require('./config/register')({
     env: 'local',
-    browser: 'dappeteer'
+    //  browser: 'puppeteer'
 });
 
 exports.config = {

@@ -4,6 +4,7 @@ import { PageWithToken } from "objects/pages/withToken/base";
 import { PuppeteerWrapper } from "framework/object/wrapper/browser";
 import { label, attribute, present } from "framework/object/core/decorators";
 import { inject, injectable } from "framework/object/core/iConstructor";
+import { Metamask } from "extensions/metamask";
 
 enum Status {
     Pass, Fail, Loading
@@ -35,7 +36,7 @@ export class Transaction extends AbstractFeature {
     }
     public async handleTransaction(cancel: boolean = false): Promise<TransactionResult> {
         // TODO: Implement transaction cancelling
-        (await (oh.browser as PuppeteerWrapper).handle.metamask).confirmTransaction();
+        await Metamask.instance.confirmTransaction();
         for (let transaction of this.transactions) {
             if (transaction.status === Status.Loading) {
                 return await transaction.refresh();
