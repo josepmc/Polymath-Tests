@@ -7,9 +7,9 @@ import { VerificationEmail } from "objects/pages/emails/verification";
 import { CorePage } from "objects/pages/base";
 
 class EmailConfirmed extends AbstractFeature {
-    public featureSelector: Locator = By.xpath('//body[.//button[text()="Continue with STO Process"]]');
+    public featureSelector: Locator = By.xpath('//body[.//button[text()="CONTINUE WITH TOKEN CREATION"]]');
     public next(): Promise<CorePage> {
-        return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--primary")]'), this.element).then(() => CorePage.Get<CorePage>(CorePage));
+        return oh.click(By.xpath('.//button[contains(@class, "bx--btn--primary")][text()="CONTINUE WITH TOKEN CREATION"]'), this.element).then(() => CorePage.Get<CorePage>(CorePage));
     }
 }
 

@@ -1,9 +1,9 @@
 import { AbstractFeature, forceVisibility } from "framework/object/abstract";
 import { Locator, By, oh } from "framework/helpers";
-import { PageWithToken } from "objects/pages/withToken/base";
 import { label, attribute, present, LabelOptsMode } from "framework/object/core/decorators";
 import { inject, injectable } from "framework/object/core/iConstructor";
 import { Metamask } from "extensions/metamask";
+import { CorePage } from "objects/pages/base";
 
 export enum Status {
     Pass, Fail, Loading
@@ -37,12 +37,12 @@ export enum Status {
 @injectable @forceVisibility export class Transaction extends AbstractFeature {
     protected featureSelector: Locator = By.xpath('.//*[@class="bx--modal-container"][.//*[@class="bx--modal-header__label" and text()="Transaction Processing"]]');
     @inject(TransactionResult, { multiInstance: true }) public transactions: TransactionResult[];
-    public async next(): Promise<PageWithToken | TransactionResult> {
+    public async next(): Promise<CorePage | TransactionResult> {
         // If continue is not present, return handleTransaction(true)
         let button = By.xpath('.//*[@class="pui-tx-continue"]/button');
         if (await oh.visible(button)()) {
             await oh.click(button);
-            return await PageWithToken.WaitForPage(PageWithToken) as PageWithToken;
+            return await CorePage.WaitForPage(CorePage) as CorePage;
         }
         return await this.handleTransaction();
     }
