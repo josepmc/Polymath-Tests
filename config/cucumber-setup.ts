@@ -32,6 +32,6 @@ After(async function (this: World, scenario: HookScenarioResult) {
         let base64 = await oh.browser.takeScreenshot();
         //this.attach(base64, 'image/png');
     }
-    await oh.restart();
+    //await oh.restart();
 });
 
