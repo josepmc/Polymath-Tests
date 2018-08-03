@@ -5,6 +5,7 @@ import { expect } from "framework/helpers";
 import { IssuerTest } from "tests/issuerTest";
 import { IssuerTestData } from "tests/issuerTestData";
 import { StoCountdown } from "objects/pages/withToken/sto/stoCountdown";
+import { CorePage } from "objects/pages/base";
 
 @binding([IssuerTestData])
 class STOToken extends IssuerTest {

@@ -7,7 +7,9 @@ export class IssuerTest {
     constructor(public data: IssuerTestData) { }
     public static async ApproveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
         let modal = openModal || await clickFn();
+        if (!modal) debugger;
         let transaction = await modal.next();
+        if (!transaction) debugger;
         while (transaction instanceof Modal) {
             if (transaction instanceof PolyModal) {
                 await transaction.handleTransaction();

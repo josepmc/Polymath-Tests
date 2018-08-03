@@ -24,7 +24,7 @@ export class WhitelistFeature extends AbstractFeature implements WhitelistModel 
             checkedSelector: By.xpath('//*[@id="percentage"][not(ancestor::*[contains(@style,"display: none")])]'), postSet: async function () {
                 if (this._val === false && this._val != this._oldVal) {
                     // We will have a Modal dialog popping in
-                    await IssuerTest.ApproveTransactions(() => null, await Modal.Get<Modal>(Modal));
+                    await IssuerTest.ApproveTransactions(() => null, await Modal.WaitForPage<Modal>(Modal));
                 }
             }
         }) public enableOwnershipPermissions: boolean;
@@ -33,7 +33,7 @@ export class WhitelistFeature extends AbstractFeature implements WhitelistModel 
         // This is more of an 'apply', but we're setting a custom method here
         if (!this.enableOwnershipPermissions) return null;
         await oh.click(By.xpath('.//button[preceding-sibling::*[@for="percentage"]]'), this.element);
-        return Modal.Get<Modal>(Modal);
+        return Modal.WaitForPage<Modal>(Modal);
     }
     public async import(): Promise<WhitelistModal> {
         await oh.click(By.xpath('.//*[contains(@class,"import-whitelist-btn") and contains(@class, "bx--btn--primary")]'), this.element);

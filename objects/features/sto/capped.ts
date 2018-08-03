@@ -33,7 +33,7 @@ import { Modal } from "objects/features/general/modal";
     @label<number>(By.xpath('.//fieldset'), /(\d+)/, { mode: LabelOptsMode.Text }) public fundsRaised: number;
 
     public next(): Promise<Modal> {
-        return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--primary")]'), this.element).then(() => Modal.Get<Modal>(Modal));
+        return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--primary")]'), this.element).then(() => Modal.WaitForPage<Modal>(Modal));
     }
 }
 

@@ -24,6 +24,6 @@ import { CountdownFeature } from "objects/features/token/countdown";
     public countdown: CountdownFeature = new CountdownFeature(this);
     public async next(): Promise<Modal> {
         await oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--primary")]'), this.element);
-        return Modal.Get<Modal>(Modal);
+        return Modal.WaitForPage<Modal>(Modal);
     }
 }

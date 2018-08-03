@@ -42,7 +42,7 @@ export enum Status {
         let button = By.xpath('.//*[@class="pui-tx-continue"]/button');
         if (await oh.visible(button)()) {
             await oh.click(button);
-            return await PageWithToken.Get(PageWithToken) as PageWithToken;
+            return await PageWithToken.WaitForPage(PageWithToken) as PageWithToken;
         }
         return await this.handleTransaction();
     }

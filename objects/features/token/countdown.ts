@@ -12,6 +12,6 @@ export abstract class AbstractCountdownFeature extends AbstractFeature { }
 @injectable export class CreateTokenCountdown extends AbstractCountdownFeature {
     public featureSelector: Locator = By.xpath('.//*[@class="pui-countdown"]');
     public next(): Promise<Modal> {
-        return oh.click(By.xpath('.//button'), this.element).then(() => Modal.Get<Modal>(Modal));
+        return oh.click(By.xpath('.//button'), this.element).then(() => Modal.WaitForPage<Modal>(Modal));
     }
 }

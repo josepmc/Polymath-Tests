@@ -4,8 +4,6 @@ import { IssuerTestData } from "tests/issuerTestData";
 import { MintPage } from "objects/pages/withToken/token/mint";
 import { expect } from "framework/helpers";
 import * as path from 'path';
-import { TransactionResult } from "objects/features/general/transaction";
-import { Modal } from "objects/features/general/modal";
 
 @binding([IssuerTestData])
 class MintToken extends IssuerTest {
