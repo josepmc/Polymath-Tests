@@ -26,11 +26,11 @@ export abstract class Modal extends AbstractFeature {
 }
 
 @injectable @forceVisibility export class NormalModal extends Modal {
-    protected featureSelector: Locator = By.xpath('.//*[contains(@class, "bx--modal") and contains(@class, "is-visible")][not(.//button[contains(text(),"REQUEST") and contains(text(),"POLY")])]');
+    protected featureSelector: Locator = By.xpath('.//*[contains(@class, "bx--modal") and contains(@class, "is-visible")][not(.//*[@class="pui-tx-row"])][not(.//button[contains(text(),"REQUEST") and contains(text(),"POLY")])]');
 }
 
 @injectable @forceVisibility export class PolyModal extends Modal {
-    protected featureSelector: Locator = By.xpath('.//*[contains(@class, "bx--modal") and contains(@class, "is-visible")][.//button[contains(text(),"REQUEST") and contains(text(),"POLY")]]');
+    protected featureSelector: Locator = By.xpath('.//*[contains(@class, "bx--modal") and contains(@class, "is-visible")][not(.//*[@class="pui-tx-row"])][.//button[contains(text(),"REQUEST") and contains(text(),"POLY")]]');
     public async handleTransaction() {
         let t = await this.next();
         let tr = await t.next() as TransactionResult;

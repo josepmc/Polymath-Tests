@@ -9,6 +9,5 @@ Feature: Compliance test
         And Capped STO launched
 
     Scenario: Modify whitelist positive path
-        Given The issuer whitelists a new investor
-        And The issuer removes the investor from the whitelist
-        Then The whitelist remains unmodified
+        Given The issuer changes ownership settings
+        And The issuer adds investors to the whitelist

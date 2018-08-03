@@ -292,11 +292,10 @@ export function range(minimum: Locator, maximum: Locator, opts: CallOpts = { mai
 
 
 const isSelected = async function (element: ElementWrapper, opts: CheckedOpts) {
-    return await oh.selected(element) ||
-        (opts.checkedSelector && (
-            (typeof opts.checkedSelector === 'function' && await opts.checkedSelector.call(this, element)) ||
-            (Locator.instanceOf(opts.checkedSelector) && await oh.present(opts.checkedSelector, element))
-        ));
+    return (opts.checkedSelector && (
+        (typeof opts.checkedSelector === 'function' && await opts.checkedSelector.call(this, element)) ||
+        (Locator.instanceOf(opts.checkedSelector) && await oh.present(opts.checkedSelector, element))
+    )) || await oh.selected(element);
 };
 
 export interface CheckedOpts extends CallOpts {
@@ -426,7 +425,8 @@ export function inputField<T extends number | string | number[] | string[]>(loca
     }, async function (value: T): Promise<void> {
         let locator = locatorPre instanceof Function ? locatorPre.apply(this.target) : locatorPre;
         // Field not present (optional)
-        if (!await oh.present(locator, this.target.element)) return undefined;
+        if (!await oh.present(locator, this.target.element) || !(await oh.visible(locator, this.target.element)()))
+            return undefined;
         let clickables = clickLocator ? await oh.all(clickLocator, this.target.element) : [];
         for (let [idx, el] of (await oh.all(locator, this.target.element)).entries()) {
             if (clickables.length && opts.clickMode & ClickMode.ClickBeforeSet) {
@@ -445,7 +445,7 @@ export function inputField<T extends number | string | number[] | string[]>(loca
                 } else opts.neverClear ? await oh.type(el, val, 0, this.target.element) :
                     await oh.typeCleared(el, val, this.target.element);
             } else {
-                assert(!value, `Decorator - InputField: Error! Can't type in a disabled checkbox`);
+                assert(!value && value != 0, `Decorator - InputField: Error! Can't type in a disabled checkbox`);
             }
             if (opts.sendEnter) {
                 await oh.type(el, oh.key.ENTER, 0, this.target.element);

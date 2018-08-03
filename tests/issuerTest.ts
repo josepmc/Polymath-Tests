@@ -5,7 +5,7 @@ import { AbstractPage } from "framework/object/abstract";
 
 export class IssuerTest {
     constructor(public data: IssuerTestData) { }
-    public async approveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
+    public static async ApproveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
         let modal = openModal || await clickFn();
         let transaction = await modal.next();
         while (transaction instanceof Modal) {
@@ -18,5 +18,8 @@ export class IssuerTest {
         let result;
         while ((result = await transaction.next()) instanceof TransactionResult) { }
         return result;
+    }
+    public async approveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
+        return IssuerTest.ApproveTransactions(clickFn, openModal);
     }
 }

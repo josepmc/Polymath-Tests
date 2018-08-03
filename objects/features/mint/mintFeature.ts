@@ -8,7 +8,7 @@ import { Modal } from "objects/features/general/modal";
 
 @injectable export class MintFeature extends AbstractFeature {
     protected featureSelector: Locator = By.xpath('.//*[@class="mint-tokens-wrapper"]');
-    @inputField<string>(By.xpath('.//*[@id="id8"]')) public file: string;
+    @inputField<string>(By.xpath('.//input[@type="file"]')) public file: string;
     public async download() {
         // TODO: Handle file downloads
         return oh.click(By.xpath('.//*[@download]'), this.element);

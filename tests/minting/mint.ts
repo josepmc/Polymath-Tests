@@ -14,7 +14,6 @@ class MintToken extends IssuerTest {
     public async startNewMinting() {
         this.page = await new MintPage().navigation.navigate(MintPage);
         expect(this.page).to.be.instanceof(MintPage);
-        // TODO: Fix this
         this.page.mint.file = path.join(__dirname, 'file.csv');
         await this.page.apply();
     }
@@ -27,8 +26,7 @@ class MintToken extends IssuerTest {
     @given(/Investors are minted/)
     public async createAToken() {
         await this.startNewMinting();
-        // Skip this for now, fix upload
-        //await this.investorsAreMinted();
+        await this.investorsAreMinted();
     }
 }
 

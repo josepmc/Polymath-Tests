@@ -4,6 +4,7 @@ import { CappedStoConfigModel } from "models/cappedStoConfig";
 import { TokenInfoModel } from "models/tokenInfo";
 import { EmailHandler } from "helpers/email";
 import { TestConfig } from "framework/helpers";
+import { WhitelistModel } from "models/whitelistModel";
 
 // Defines a Token and all the related information
 export class IssuerTestData {
@@ -24,4 +25,6 @@ export class IssuerTestData {
     public stoConfig: CappedStoConfigModel = new CappedStoConfigModel();
 
     public email: EmailHandler = new EmailHandler(TestConfig.instance.protractorConfig.emailConfig);
+
+    public whitelist: WhitelistModel = new WhitelistModel();
 }
