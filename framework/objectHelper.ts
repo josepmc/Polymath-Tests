@@ -6,6 +6,7 @@ import {
     promise as ProtractorPromise,
     ProtractorBrowser,
     WebElement,
+    protractor,
 } from 'protractor';
 import { StoreObject, SortedObject } from './object/interfaces';
 import { BrowserWrapper } from './object/wrapper';
@@ -120,7 +121,7 @@ export class ObjectHelper {
             if (resetCache) this.browser.resetCache(keepIframe);
         } catch (err) {
             debugger;
-            assert(!err, `Click: An error occurred for ${selector && selector['value']}: ${err}`);
+            assert(!err, `Click: An error occurred for ${selector && (selector instanceof ElementFinder ? selector.locator() : selector['value'])}: ${err}`);
         }
     }
 
@@ -189,7 +190,7 @@ export class ObjectHelper {
         method: (selector: Locator | WebElement | ElementWrapper, ...params: any[]) => Promise<T>,
         parent?: Locator | WebElement | ElementWrapper, splitParamArray: boolean = false, ...params: any[]): Promise<T[]> {
         if (!params) params = [];
-        if (selector instanceof Locator) selector = await this.all(selector, parent);
+        if (Locator.instanceOf(selector)) selector = await this.all(selector, parent);
         let results: T[] = [], i = 0;
         if (splitParamArray) {
             // Split the parameters
@@ -229,7 +230,7 @@ export class ObjectHelper {
     }
 
     public async present(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper): Promise<boolean> {
-        return this.browser.present(selector, parent);
+        return await this.browser.present(selector, parent);
     }
 
     public async displayed(selector: Locator | ElementWrapper,
@@ -307,6 +308,10 @@ export class ObjectHelper {
     public async selected(selector: Locator | ElementWrapper,
         parent?: Locator | ElementWrapper): Promise<boolean> {
         return await (await this.by(selector, parent)).isSelected();
+    }
+
+    public get key() {
+        return protractor.Key;
     }
 
     public async back(): Promise<void> {

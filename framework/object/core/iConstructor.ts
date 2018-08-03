@@ -261,7 +261,7 @@ export abstract class IConstructor<I extends InitOpts = InitOpts> {
             // getter / setter or normal values
             let thisProperty = await this[property], paramProperty = await param[property], tempObj = {};
             if (paramProperty === undefined && opts.undefinedEqualsNotPresent) continue;
-            if (thisProperty instanceof Locator && paramProperty instanceof Locator) {
+            if (Locator.instanceOf(thisProperty) && Locator.instanceOf(paramProperty)) {
                 localEqual = LocatorCompare(thisProperty, paramProperty);
             } else if (thisProperty instanceof IConstructor && paramProperty instanceof IConstructor) {
                 if (thisProperty === undefined || paramProperty === undefined) continue;

@@ -158,7 +158,11 @@ export abstract class AbstractObject<I extends AbstractObjectInitOpts = Abstract
             if (!descriptor) debugger;
             let metadata: InjectArgs = Reflect.getMetadata(injectKey, this, property);
             if (metadata && descriptor.value === undefined) await this.setupProperties(<any>{ mode: InitMode.SingleObject }, [property]);
-            if (recursive && descriptor.value instanceof AbstractObject) {
+            descriptor = propertyDescriptor(this, property); // Refresh the descriptor
+            if (recursive && descriptor.value instanceof Array) {
+                for (let el of this[property]) await (el as AbstractObject).refresh();
+            }
+            else if (recursive && descriptor.value instanceof AbstractObject) {
                 // We assume that every property will be shown when the parent property is shown already... maybe this is not right
                 await (this[property] as AbstractObject).refresh();
             } else {

@@ -6,7 +6,7 @@ import { CreateTokenFeature } from "objects/features/mint/createTokenFeature";
 
 
 @injectable export class CreateToken extends BaseToken {
-    protected featureSelector: Locator = By.xpath('self::*[.//*[@class="mint-tokens-wrapper"]]');
+    protected featureSelector: Locator = By.xpath('self::*[.//*[@class="create-token-wrapper"]]');
     public create: CreateTokenFeature = new CreateTokenFeature(this);
     public tokenInfo: TokenInfo = new TokenInfo(this);
 }

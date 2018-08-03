@@ -652,7 +652,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
     }
     public async scrollTo(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper): Promise<boolean> {
         let element = await this.by(selector, parent) as ElementWrapper;
-        await this.executeScript('arguments[0].scrollIntoView();', await element.getWebElement());
+        await this.executeScript("arguments[0].scrollIntoView( { behavior: 'smooth', block: 'start' });", await element.getWebElement());
         return true;
     }
     public visible(locator: Locator | ElementWrapper,

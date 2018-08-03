@@ -6,5 +6,5 @@ Feature: Reserve a token test
 
     Scenario: Reserve a Token positive path
         Given The issuer fills in the token information
-        And The issuer creates an account
+        And The issuer activates his account
         Then The issuer has the token reserved

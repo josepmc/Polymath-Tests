@@ -2,6 +2,8 @@ import { TickerModel } from "models/ticker";
 import { IssuerModel } from "models/issuer";
 import { CappedStoConfigModel } from "models/cappedStoConfig";
 import { TokenInfoModel } from "models/tokenInfo";
+import { EmailHandler } from "helpers/email";
+import { TestConfig } from "framework/helpers";
 
 // Defines a Token and all the related information
 export class IssuerTestData {
@@ -11,9 +13,15 @@ export class IssuerTestData {
     // A token has ticker data, that identifies it
     public tickerData: TickerModel = new TickerModel();
 
+    public generateTicker() {
+        return this.tickerData = new TickerModel();
+    }
+
     // A token has token info, that defines it
     public tokenInfo: TokenInfoModel = new TokenInfoModel();
 
     // A token has an STO
     public stoConfig: CappedStoConfigModel = new CappedStoConfigModel();
+
+    public email: EmailHandler = new EmailHandler(TestConfig.instance.protractorConfig.emailConfig);
 }

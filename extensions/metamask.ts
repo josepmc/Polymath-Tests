@@ -12,8 +12,6 @@ import rsa = require('node-rsa');
 
 export interface MetamaskOptions {
     extensionId: string;
-    gasLimit: number,
-    gas: number;
 }
 
 const timeout = seconds =>
@@ -74,7 +72,6 @@ export class Metamask extends Extension {
                     // Repack the extension
                     let manifestFile = path.join(folder.name, 'manifest.json');
                     let manifest = JSON.parse(fs.readFileSync(manifestFile).toString());
-                    //manifest.key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlcgI4VVL4JUvo6hlSgeCZp9mGltZrzFvc2Asqzb1dDGO9baoYOe+QRoh27/YyVXugxni480Q/R147INhBOyQZVMhZOD5pFMVutia9MHMaZhgRXzrK3BHtNSkKLL1c5mhutQNwiLqLtFkMSGvka91LoMEC8WTI0wi4tACnJ5FyFZQYzvtqy5sXo3VS3gzfOBluLKi7BxYcaUJjNrhOIxl1xL2qgK5lDrDOLKcbaurDiwqofVtAFOL5sM3uJ6D8nOO9tG+T7hoobRFN+nxk43PHgCv4poicOv+NMZQEk3da1m/xfuzXV88NcE/YRbRLwAS82m3gsJZKc6mLqm4wZHzBwIDAQAB";
                     var key = new rsa({ b: 2048 }),
                         keyVal = key.exportKey('pkcs1-private-pem');
                     let crx = new ChromeExtension({
@@ -99,9 +96,9 @@ export class Metamask extends Extension {
         }
     }
     private options: MetamaskOptions = {
+        // If you want to use the following extension id, set this key in your manifest.json
+        // "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlcgI4VVL4JUvo6hlSgeCZp9mGltZrzFvc2Asqzb1dDGO9baoYOe+QRoh27/YyVXugxni480Q/R147INhBOyQZVMhZOD5pFMVutia9MHMaZhgRXzrK3BHtNSkKLL1c5mhutQNwiLqLtFkMSGvka91LoMEC8WTI0wi4tACnJ5FyFZQYzvtqy5sXo3VS3gzfOBluLKi7BxYcaUJjNrhOIxl1xL2qgK5lDrDOLKcbaurDiwqofVtAFOL5sM3uJ6D8nOO9tG+T7hoobRFN+nxk43PHgCv4poicOv+NMZQEk3da1m/xfuzXV88NcE/YRbRLwAS82m3gsJZKc6mLqm4wZHzBwIDAQAB",
         extensionId: 'nkbihfbeogaeaoehlefnkodbefgpgknn',
-        gas: 20,
-        gasLimit: 100000
     }
     public get extensionUrl() { return `chrome-extension://${this.options.extensionId}/popup.html`; }
     public static get instance(): Metamask {
@@ -121,14 +118,6 @@ export class Metamask extends Extension {
             if (config && config.extensions && config.extensions[Metamask.key])
                 this.options = config.extensions[Metamask.key] as MetamaskOptions;
         }
-    }
-
-    public waitForSignInScreen() {
-        return oh.by(By.xpath('.//*[@id="metamask-mascot-container"]'));
-    }
-
-    public waitForConfirmationPrompt() {
-        return oh.by(By.xpath('.//*[@class="page-subtitle"]'));
     }
 
     private window: WindowInfo;
@@ -182,7 +171,7 @@ export class Metamask extends Extension {
         await oh.click(By.xpath('.//*[@class="sandwich-expando"]'));
         await timeout(0.5);
         await oh.click(By.xpath('.//*[@class="menu-droppo"]//*[@class="dropdown-menu-item"]'));
-        await this.waitForSignInScreen();
+        await oh.by(By.xpath('.//*[@id="metamask-mascot-container"]'));
         await this.exitPage();
     }
     public async unlock(password = 'password1234') {
@@ -204,22 +193,54 @@ export class Metamask extends Extension {
     // TODO: Add changing an account
     // TODO: Make sure to switch to the original page after interacting with metamask
     // TODO: Refresh the page multiple times if the transaction is not appearing still
-    public async confirmTransaction() {
+    public async confirmTransaction(opts?: { gasLimit?: number, gas?: number }) {
         await this.navigateToPage();
-        await oh.refresh();
-        await this.waitForConfirmationPrompt();
+        await oh.wait(async () => {
+            let present = await oh.present(By.xpath('.//*[@class="page-subtitle"]'));
+            if (present) return present;
+            await oh.browser.sleep(0.5);
+            present = await oh.present(By.xpath('.//*[@class="page-subtitle"]'));
+            if (!present) await oh.refresh();
+            return present;
+        }, `Timeout waiting for the transaction to appear`)
         let inputs = await oh.all(By.xpath('.//input[@type="number" and @class="hex-input"]'));
         let confirmButton;
         if (!inputs.length) {
             confirmButton = await oh.by(By.xpath('.//button[text()="Sign"]'));
         } else {
-            await oh.type(inputs[0], this.options.gasLimit);
-            await oh.type(inputs[1], this.options.gas);
-            confirmButton = await oh.by(By.xpath('.//input[@type="submit"][@class="confirm"][not(@disabled)]'));
+            if (opts && opts.gasLimit) await oh.type(inputs[0], opts.gasLimit);
+            if (opts && opts.gas) await oh.type(inputs[1], opts.gas);
+            confirmButton = await oh.by(By.xpath('.//input[@type="submit" and contains(@class,"confirm") and not(@disabled)]'));
         }
         await confirmButton.click();
         await oh.by(By.xpath('.//*[contains(@class,"account-detail-section")]'));
         await this.exitPage();
+    }
+
+    public async switchAccount(name?: string) {
+        await this.navigateToPage();
+        await oh.click(By.xpath('.//*[contains(@class,"accounts-selector")]'));
+        await oh.wait(oh.visible(By.xpath('.//*[@class="menu-droppo"]')), `Timeout waiting for the dropdown menu to appear`);
+        let dropdown: ElementWrapper = await oh.by(By.xpath('.//*[@class="menu-droppo-container"][.//*[@class="menu-droppo"]]'));
+        let el;
+        if (!name) {
+            // Create new account
+            el = await oh.by(By.xpath('.//li[@class="dropdown-menu-item"][.//span[text()="Create Account"]]'));
+        }
+        else el = await oh.by(By.xpath(`.//li[@class="dropdown-menu-item"][.//span[text()="${name}"]]`));
+        await oh.browser.executeScript(`arguments[0].scroll(0, arguments[1].offsetTop)`, await dropdown.getWebElement(), await el.getWebElement());
+        await oh.click(el);
+        await oh.by(By.xpath('.//*[contains(@class,"account-detail-section")]'));
+        await this.exitPage();
+    }
+
+    public async accountInfo(): Promise<{ name: string, ethAmount: number, ethAddress: string }> {
+        await this.navigateToPage();
+        let name = await oh.text(By.xpath('.//*[@name="edit"]'));
+        let ethAmount = await oh.text(By.xpath('.//*[@class="flex-row"][./*[text()="ETH"]]/div[1]'));
+        let ethAddress = await oh.text(By.xpath('.//div[@class="flex-row"][preceding-sibling::*[@class="name-label"]]/div'));
+        await this.exitPage();
+        return { name: name, ethAmount: parseFloat(ethAmount), ethAddress: ethAddress };
     }
 }
 

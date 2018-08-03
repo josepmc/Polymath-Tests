@@ -21,13 +21,13 @@ class STOToken extends IssuerTest {
     public async configureSTO() {
         let config: CappedStoConfig = await CappedStoConfig.Get(CappedStoConfig) as CappedStoConfig;
         await config.fill(this.data.stoConfig);
-        await config.next(); // Here we need to jump through the transactions...
+        await this.approveTransactions(() => config.next()); // Here we need to jump through the transactions...
     }
 
     @then(/The Capped STO is started/)
     public async stoIsStarted() {
         let page = await new StoCountdown().navigation.navigate(StoCountdown);
-        expect(page instanceof StoCountdown).to.be.true;
+        expect(page).to.be.instanceof(StoCountdown);
     }
 
     @given(/Capped STO launched/)

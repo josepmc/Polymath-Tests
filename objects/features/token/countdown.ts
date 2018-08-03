@@ -1,7 +1,17 @@
 import { AbstractFeature } from "framework/object/abstract";
-import { Locator, By } from "framework/helpers";
+import { Locator, By, oh } from "framework/helpers";
+import { injectable } from "framework/object/core/iConstructor";
+import { Modal } from "objects/features/general/modal";
 
+export abstract class AbstractCountdownFeature extends AbstractFeature { }
 
-export class CountdownFeature extends AbstractFeature {
-    public featureSelector: Locator = By.xpath('.//*[@class="pui-countdown-time"]');
+@injectable export class CountdownFeature extends AbstractCountdownFeature {
+    public featureSelector: Locator = By.xpath('.//*[contains(@class,"pui-countdown ") or @class="pui-countdown"]');
+}
+
+@injectable export class CreateTokenCountdown extends AbstractCountdownFeature {
+    public featureSelector: Locator = By.xpath('.//*[@class="pui-countdown"]');
+    public next(): Promise<Modal> {
+        return oh.click(By.xpath('.//button'), this.element).then(() => Modal.Get<Modal>(Modal));
+    }
 }

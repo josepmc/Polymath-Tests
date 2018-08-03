@@ -2,7 +2,7 @@ import 'reflect-metadata';
 export { TestConfig } from './testConfig';
 export { RunnerConfig } from '../config/definition'; // TODO: Refactor this
 import { By as WebdriverBy } from 'selenium-webdriver';
-import { helperBrowsers } from 'protractor';
+import { helperBrowsers, ProtractorBy } from 'protractor';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
@@ -16,7 +16,10 @@ export { NumberRange } from './object/interfaces';
 export { ElementWrapper, WindowInfo } from './object/wrapper';
 export let oh: ObjectHelper = new ObjectHelper(() => helperBrowsers);
 export type Locator = WebdriverBy;
-export const Locator = WebdriverBy;
+export const Locator = {
+    ...WebdriverBy, instanceOf: loc =>
+        loc instanceof WebdriverBy || loc instanceof ProtractorBy || (loc['using'] && loc['value'])
+};
 export let By: ByWrapper;
 export let by: ByWrapper;
 module.exports = {

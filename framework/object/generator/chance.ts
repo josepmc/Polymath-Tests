@@ -16,10 +16,21 @@ export class ChanceGenerator extends DataGenerator {
     }
 
     public string(opts?: Chance.Options) {
+        if (!opts) opts = {};
+        let length = opts.length || undefined;
+        let str = "";
+        if (length === 0) return str;
         // Avoid creating strings that start with a number
-        return this.chance.string({
-            pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()[]',
-        }) + this.chance.string(opts);
+        if (!opts.skipFirst) {
+            str += this.chance.string({
+                pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()[]',
+                length: 1
+            });
+            length--;
+            if (!length) return str;
+        }
+        if (length) return str + this.chance.string({ ...opts, length: length - 1 });
+        return str + this.chance.string(opts);
     }
 
     public first(opts?: Chance.Options) {
@@ -77,7 +88,7 @@ export class ChanceGenerator extends DataGenerator {
     }
 
     public date(opts?: Chance.DateOptions) {
-        return moment(this.chance.date(opts)).format('DD/MM/YYYY');
+        return moment(this.chance.date(opts)).format(opts && opts.american ? 'MM/DD/YYYY' : 'DD/MM/YYYY');
     }
 
     public pickone<T>(arr: T[]) {

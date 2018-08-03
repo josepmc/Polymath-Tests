@@ -293,10 +293,9 @@ export function range(minimum: Locator, maximum: Locator, opts: CallOpts = { mai
 
 const isSelected = async function (element: ElementWrapper, opts: CheckedOpts) {
     return await oh.selected(element) ||
-        await oh.checked(element) ||
         (opts.checkedSelector && (
             (typeof opts.checkedSelector === 'function' && await opts.checkedSelector.call(this, element)) ||
-            (opts.checkedSelector instanceof Locator && await oh.present(opts.checkedSelector, element))
+            (Locator.instanceOf(opts.checkedSelector) && await oh.present(opts.checkedSelector, element))
         ));
 };
 
@@ -367,6 +366,7 @@ export interface InputFieldCallOpts extends CheckedOpts {
     clickMode?: ClickMode;
     ByText?: boolean;
     neverClear?: boolean;
+    sendEnter?: boolean;
 }
 
 // tslint:disable-next-line:valid-jsdoc
@@ -447,8 +447,12 @@ export function inputField<T extends number | string | number[] | string[]>(loca
             } else {
                 assert(!value, `Decorator - InputField: Error! Can't type in a disabled checkbox`);
             }
-            if (clickables.length && opts.clickMode & ClickMode.ClickAfterSet) {
-                await oh.moveClick(clickables[idx], null, opts.causesRefresh);
+            if (opts.sendEnter) {
+                await oh.type(el, oh.key.ENTER, 0, this.target.element);
+            }
+            if (clickLocator && opts.clickMode & ClickMode.ClickAfterSet) {
+                if (!clickables.length) clickables = await oh.all(clickLocator, this.target.element);
+                if (clickables.length) await oh.moveClick(clickables[idx], null, opts.causesRefresh);
             }
         }
     }, null, opts);

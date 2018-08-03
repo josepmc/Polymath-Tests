@@ -19,6 +19,11 @@ Before(async function (this: World, scenario: HookScenarioResult) {
     if (!password) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_PASSWORD' for the tests to work`;
     await Metamask.instance.importAccount(secret, password);
     await Metamask.instance.switchNetwork(Network.Kovan);
+    if (process.env.METAMASK_ACCOUNT_NUMBER)
+        for (let i = 1; i < parseInt(process.env.METAMASK_ACCOUNT_NUMBER); ++i)
+            await Metamask.instance.switchAccount();
+    let info = await Metamask.instance.accountInfo();
+    console.log(`INFO: Using '${info.name}' (${info.ethAddress}) with ${info.ethAmount} ETH`);
 });
 
 After(async function (this: World, scenario: HookScenarioResult) {

@@ -1,7 +1,7 @@
-import { PuppeteerHandle, PuppeteerOptions } from 'framework/object/wrapper/puppeteer';
+import { PuppeteerHandle } from 'framework/object/wrapper/puppeteer';
 import { Arguments, argv as BaseArguments } from 'yargs';
 import { RunnerConfig } from './definition';
-import { ExtensionManager, ExtensionBrowser, ExtensionData, Extension, ExtensionInfo, ExtensionConfig } from 'extensions';
+import { ExtensionManager, ExtensionBrowser, ExtensionData, ExtensionInfo, ExtensionConfig } from 'extensions';
 import * as deasync from 'deasync';
 import { readFileSync } from 'fs';
 
@@ -78,7 +78,7 @@ export = (opts = {}) => {
                 require: [
                     './config/cucumber-setup.ts',
                     //'./framework/**/*.ts',
-                    //'./objects/**/*.ts',
+                    './objects/**/*.ts',
                     './tests/**/*.ts',
                 ],
                 tags: currentEnv.argv.tags || '',
@@ -93,7 +93,7 @@ export = (opts = {}) => {
                 for (let fn of shutdownFns) await fn();
             },
             params: {
-                generatorSeed: currentEnv.argv.seed || Math.random(),
+                generatorSeed: currentEnv.argv.seed || (Math.random() * Number.MAX_SAFE_INTEGER),
             },
             ...environments[currentEnv.argv.env || 'local']
         };
@@ -104,8 +104,7 @@ export = (opts = {}) => {
                 let pup = new PuppeteerHandle({
                     headless: false, //true,
                     // If we're using command line flags, we can only pass uncompressed directories
-                    extensions: extensions
-                        .map(ex => ex.data.uncompressed)
+                    extensions: extensions.map(ex => ex.data.uncompressed)
                 });
                 currentEnv.config.directConnect = true;
                 currentEnv.config.capabilities = {

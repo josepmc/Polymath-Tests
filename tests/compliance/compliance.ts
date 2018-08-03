@@ -6,7 +6,7 @@ import { IssuerTestData } from "tests/issuerTestData";
 class MintToken extends IssuerTest {
     @given(/The issuer whitelists a new investor/)
     public async newInvestor() {
-
+        debugger;
     }
 
     @given(/The issuer removes the investor from the whitelist/)
@@ -15,8 +15,9 @@ class MintToken extends IssuerTest {
     }
 
     @then(/The whitelist remains unmodified/)
-    public async investorsAreMinted() {
-
+    public async modifyWhitelist() {
+        await this.newInvestor();
+        await this.removesInvestor();
     }
 }
 

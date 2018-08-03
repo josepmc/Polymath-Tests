@@ -6,6 +6,6 @@ let baseConfig = require('./config/register')({
 exports.config = {
     ...baseConfig.config,
     specs: [
-        'tests/auth/sign.feature'
+        'tests/compliance/compliance.feature'
     ],
 }

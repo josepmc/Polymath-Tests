@@ -5,18 +5,21 @@ import { CreateToken } from "objects/pages/withToken/token/createToken";
 import { expect } from "framework/helpers";
 import { TransactionResult } from "objects/features/general/transaction";
 import { MintPage } from "objects/pages/withToken/token/mint";
+import { Modal } from "objects/features/general/modal";
+import { Providers } from "objects/pages/withToken/providers/providers";
 
 @binding([IssuerTestData])
 class CreateTokenTest extends IssuerTest {
+
     @given(/The issuer creates a token/)
     public async startNewToken() {
+        let providers = await Providers.Get(Providers) as Providers;
+        let modal = await providers.createToken.next();
+        await modal.next(true); // I consulted with my advisors
         let page = await new CreateToken().navigation.navigate(CreateToken);
         expect(page).to.be.instanceof(CreateToken);
         await page.create.fill(this.data.tokenInfo);
-        let modal = await page.create.next();
-        let transaction = await modal.confirm();
-        let result;
-        while ((result = await transaction.next()) instanceof TransactionResult) { }
+        await this.approveTransactions(() => page.create.next());
     }
 
     @then(/The issuer has the token created/)

@@ -9,16 +9,24 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 1. Install NodeJS (v 8.11.3)
-2. Install Yarn (v 1.7.0)
 
 ## Installation
 
 ```
 git clone git@github.com:josepmc/issuer-test.git
-$ yarn
-$ env METAMASK_SECRET=<your secret> METAMASK_PASSWORD=<your password> GMAIL_USER=<your user> GMAIL_PASSWORD=<your password> npm test
+$ npm install
+$ npm test
 ```
+The following environment variables are required for the tests to work:
+- METAMASK_SECRET: Your Metamask secret
+- METAMASK_PASSWORD: Your Metamask password 
+- METAMASK_ACCOUNT_NUMBER: Optional. Indicates which account number from Metamask to use
 
+The following are required for the email-related tests to work:
+- GMAIL_USER: Your gmail user
+- GMAIL_PASSWORD=: Your gmail password (you need to activate the set your account to allow weak security applications) or an application password
+
+You can set all these variables in a .env file if you're debugging, and VS Code will load them on runtime
 
 ## References
 

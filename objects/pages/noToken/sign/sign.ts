@@ -1,6 +1,5 @@
 import { Locator, By, oh } from "framework/helpers";
 import { injectable } from "framework/object/core/iConstructor";
-import { PuppeteerWrapper } from "framework/object/wrapper/browser";
 import { PageWithHeader } from "objects/pages/base";
 import { Metamask } from "extensions";
 

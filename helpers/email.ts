@@ -1,27 +1,34 @@
 import { ImapSimple, connect } from 'imap-simple';
-import { FetchOptions, Config } from 'imap';
 import * as deasync from 'deasync';
+import { Config, FetchOptions } from 'imap';
+import { simpleParser } from 'mailparser';
+
 
 export class EmailHandler {
     private connection: ImapSimple;
     constructor(protected opts: Config) {
-        this.connection = deasync(callback => connect({ imap: this.opts }).then(r => callback(null, r)))();
+        deasync(async callback => {
+            this.connection = await connect({ imap: this.opts });
+            await this.connection.openBox('INBOX');
+            callback(null);
+        })();
     }
     public async fetchTo(to: string): Promise<string[]> {
         let searchCriteria = [
-            'UNSEEN', 'TO', to
+            'UNSEEN', ['TO', to]
         ];
         let fetchOptions: FetchOptions = {
-            bodies: ['HEADER', 'TEXT'],
+            bodies: [''],
             markSeen: true
         };
         let results = await this.connection.search(searchCriteria, fetchOptions);
-        debugger; // TODO: Debug this
-        let messages = results.map(function (res) {
-            return res.parts.filter(function (part) {
-                return part.which === 'HEADER';
-            })[0].body.subject[0];
-        });
+        let messages: string[] = [];
+        for (let message of results) {
+            let part = message.parts.find(part => part.which === '');
+            if (!part) console.log(`Error finding content for message ${JSON.stringify(part)}`);
+            let parsed = await simpleParser(part.body);
+            messages.push((parsed.html as string) || parsed.textAsHtml)
+        }
         return messages;
     }
 }

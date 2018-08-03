@@ -9,6 +9,6 @@ import { StoSelector } from "./selector";
     @inject(StoWidget) public widget: StoWidget;
     @inject(StoConfig) public config: StoConfig;
     public back(): Promise<StoSelector> {
-        return oh.click(this.element, By.xpath('.//*[contains(@class, "pui-go-back")]')).then(() => new StoSelector().load());
+        return oh.click(By.xpath('.//*[contains(@class, "pui-go-back")]'), this.element).then(() => new StoSelector().load());
     }
 }
