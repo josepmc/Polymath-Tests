@@ -115,8 +115,10 @@ export class Metamask extends Extension {
         if (oh.browser) {
             // Try load the configuration
             let config = oh.browser.getProcessedConfig() as RunnerConfig;
-            if (config && config.extensions && config.extensions[Metamask.key])
-                this.options = config.extensions[Metamask.key] as MetamaskOptions;
+            if (config.extraConfig &&
+                config.extraConfig.extensions &&
+                config.extraConfig.extensions[Metamask.key])
+                this.options = config.extraConfig.extensions[Metamask.key] as MetamaskOptions;
         }
     }
 

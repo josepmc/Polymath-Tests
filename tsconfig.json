@@ -17,13 +17,18 @@
             "./node_modules"
         ],
         "paths": {
-            "protractor": ["node_modules/@immoweb/protractor"],
-            "lib": ["node_modules/@immoweb/protractor", "lib"]
+            "protractor": [
+                "node_modules/@josepmc/protractor"
+            ],
+            "lib": [
+                "node_modules/@josepmc/protractor",
+                "lib"
+            ]
         },
         "types": [
             "node",
             "protractor"
-        ] 
+        ]
     },
     "exclude": [
         "node_modules"

@@ -1,13 +1,9 @@
 import {
-    ElementArrayFinder,
     ElementFinder,
-    ElementHelper,
-    ExpectedConditions as EC,
-    promise as ProtractorPromise,
     ProtractorBrowser,
-    WebElement, protractor,
-} from '@immoweb/protractor/built';
-import { ILocation, ISize, promise as WebdriverPromise } from 'selenium-webdriver';
+    WebElement,
+} from 'protractor';
+import { ILocation, ISize } from 'selenium-webdriver';
 import { OldMethods, fillImplemented } from './shared';
 import { Locator, By } from '../../helpers';
 

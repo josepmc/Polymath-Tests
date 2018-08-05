@@ -4,6 +4,7 @@ import { RunnerConfig } from './definition';
 import { ExtensionManager, ExtensionBrowser, ExtensionData, ExtensionInfo, ExtensionConfig } from 'extensions';
 import * as deasync from 'deasync';
 import { readFileSync } from 'fs';
+import { LocalDownloadManager } from './download/local';
 
 process.on('uncaughtException', function (err) {
     console.error((err && err.stack) ? err.stack : err);
@@ -100,14 +101,20 @@ export = (opts = {}) => {
         switch (currentEnv.argv.params.browser.toLowerCase() || 'puppeteer') {
             case 'puppeteer': {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
-                for (let ex of extensions) currentEnv.config.extensions[ex.config.key] = ex.config.config;
                 let pup = new PuppeteerHandle({
                     headless: false, //true,
                     // If we're using command line flags, we can only pass uncompressed directories
                     extensions: extensions.map(ex => ex.data.uncompressed)
                 });
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager();
+                let ext = {};
+                for (let ex of extensions) ext[ex.config.key] = ex.config.config;
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        extensions: ext,
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'chrome',
                     chromeOptions: {
                         debuggerAddress: pup.address
@@ -117,35 +124,65 @@ export = (opts = {}) => {
             }
             case 'chrome': {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
-                for (let ex of extensions) currentEnv.config.extensions[ex.config.key] = ex.config.config;
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager();
+                let ext = {};
+                for (let ex of extensions) ext[ex.config.key] = ex.config.config;
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        extensions: ext,
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'chrome',
                     chromeOptions: {
                         // Webdriver requires .crx files
                         extensions: extensions
                             .map(ex => readFileSync(ex.data.file, 'base64'))
+                    },
+                    prefs: {
+                        'download': {
+                            'prompt_for_download': false,
+                            'default_directory': dlmgr.downloadPath(),
+                            'directory_upgrade': true
+                        }
                     }
                 }
                 break;
             }
             case 'chromium': {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
-                for (let ex of extensions) currentEnv.config.extensions[ex.config.key] = ex.config.config;
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager();
+                let ext = {};
+                for (let ex of extensions) ext[ex.config.key] = ex.config.config;
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        extensions: ext,
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'chrome',
                     chromeOptions: {
                         binary: PuppeteerHandle.bundledPath,
                         extensions:
                             extensions.map(ex => readFileSync(ex.data.file, 'base64'))
+                    },
+                    prefs: {
+                        'download': {
+                            'prompt_for_download': false,
+                            'default_directory': dlmgr.downloadPath(),
+                            'directory_upgrade': true
+                        }
                     }
                 }
                 break;
             }
             case 'firefox': {
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager()
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'firefox',
                     //TODO: Use get-firefox to download a local copy
                     //TODO: Implement metamask support
@@ -153,18 +190,25 @@ export = (opts = {}) => {
                 break;
             }
             case 'edge': {
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager()
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'edge',
                     //TODO: Implement metamask support
                 }
                 break;
             }
             case 'safari': {
-                currentEnv.config.directConnect = true;
+                let dlmgr = new LocalDownloadManager()
                 currentEnv.config.capabilities = {
+                    directConnect: true,
+                    extraConfig: {
+                        downloadManager: dlmgr.getConfig(),
+                    },
                     browserName: 'safari',
-                    //TODO: Use get-firefox to download a local copy
                     //TODO: Implement metamask support
                 }
                 break;

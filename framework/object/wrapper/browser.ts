@@ -16,10 +16,11 @@ import {
     ProtractorBrowser,
     WebElement,
     ProtractorBy
-} from '@immoweb/protractor/built';
+} from 'protractor';
 import ProtractorPerf = require('protractor-perf');
-import { ILocation, ISize, promise as WebdriverPromise, IWebDriverOptionsCookie, By as WebdriverBy } from 'selenium-webdriver';
+import { ILocation, ISize, promise as WebdriverPromise, IWebDriverOptionsCookie, By as WebdriverBy, Command } from 'selenium-webdriver';
 import parseDomain = require('parse-domain');
+import { DownloadManager } from 'config/download/abstract';
 const cssHighlight = require('../injectors/cssHighlight');
 const xPathFinder = require('../injectors/xpath');
 
@@ -192,6 +193,10 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
     public oldMethods: ProtractorBrowser;
     protected constructor(browser: ProtractorBrowser) {
         super(browser);
+        let dlmgr = (deasync(async callback =>
+            callback(null, await browser.getProcessedConfig()))() as RunnerConfig).extraConfig;
+        if (dlmgr && dlmgr.downloadManager)
+            this.downloadManager = DownloadManager.restore(dlmgr.downloadManager);
     }
     public get elementWrapper() {
         return ElementWrapper;
@@ -211,6 +216,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
         return this._by || (this._by = new ByWrapper());
     }
 
+    public downloadManager: DownloadManager;
     public static create(browser: ProtractorBrowser) {
         // Parse own constructor and find out locally implemented functions
         let caps: Capabilities = deasync(async callback =>
@@ -712,6 +718,14 @@ export class ChromeWrapper extends BrowserWrapper {
     public constructor(browser: ProtractorBrowser) {
         super(browser);
         this.runtimeFlags = deasync(async cb => { cb(null, await this.fetchRuntimeArgs(browser)); })();
+    }
+    public async setup(config: RunnerConfig): Promise<void> {
+        super.setup(config)
+        if (this.headless && this.downloadManager) {
+            let cmd = new Command('send_command');
+            cmd.setParameters({ 'cmd': 'Page.setDownloadBehavior', 'params': { 'behavior': 'allow', 'downloadPath': this.downloadManager.downloadPath() } });
+            await this.driver.schedule(cmd, 'Set the download strategy for Chrome headless');
+        }
     }
     protected static readonly MAX_WIDTH = 1080;
     protected static readonly MAX_HEIGHT = 1920;

@@ -7,13 +7,13 @@
         "node": ">=8.0.0"
     },
     "scripts": {
-        "webdriver-manager": "node_modules/@immoweb/protractor/node_modules/@immoweb/webdriver-manager/bin/webdriver-manager",
+        "webdriver-manager": "node_modules/@josepmc/protractor/node_modules/@josepmc/webdriver-manager/bin/webdriver-manager",
         "postinstall": "npm run webdriver-manager -- update",
-        "protractor": "node_modules/@immoweb/protractor/bin/protractor",
+        "protractor": "node_modules/@josepmc/protractor/bin/protractor",
         "test": "npm run protractor -- protractor.conf.js"
     },
     "dependencies": {
-        "@immoweb/protractor": "^5.2.0-6",
+        "@josepmc/protractor": "^5.2.0-6",
         "@types/chai": "^4.0.4",
         "@types/chai-as-promised": "7.1.0",
         "@types/chance": "^0.7.35",
@@ -22,6 +22,7 @@
         "@types/cucumber": "^4.0.4",
         "@types/deasync": "^0.1.0",
         "@types/extend": "^2.0.30",
+        "@types/glob": "^5.0.35",
         "@types/gm": "^1.17.32",
         "@types/imap-simple": "^3.1.1",
         "@types/mailparser": "^2.0.2",
@@ -46,6 +47,7 @@
         "dappeteer": "git+https://github.com/josepmc/dappeteer.git",
         "deasync": "^0.1.10",
         "extend": "^3.0.1",
+        "glob": "^7.1.2",
         "gm": "^1.23.0",
         "imap-simple": "^4.1.0",
         "mailparser": "^2.3.2",

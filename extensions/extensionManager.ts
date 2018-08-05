@@ -6,7 +6,7 @@ export interface ExtensionInfo {
 
 export class ExtensionManager {
     public static extensions: ExtensionInfo[] = [];
-    public static Register<T extends Extension>(extension: ExtensionInfo) {
+    public static Register(extension: ExtensionInfo) {
         this.extensions.push(extension);
     }
     public static GetExtensions(browser: ExtensionBrowser): ExtensionInfo[] {

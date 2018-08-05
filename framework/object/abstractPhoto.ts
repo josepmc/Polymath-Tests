@@ -3,7 +3,7 @@ import * as gm from 'gm';
 import { assert, oh } from '../helpers';
 import mime = require('mime-types');
 import * as path from 'path';
-import { ElementFinder, WebElement } from '@immoweb/protractor/built';
+import { ElementFinder, WebElement } from 'protractor';
 import * as tmp from 'tmp';
 const imgToCanvas = require('./injectors/imgToCanvas');
 const xpath = require('./injectors/xpath');
