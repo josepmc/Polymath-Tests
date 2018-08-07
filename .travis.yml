@@ -26,8 +26,8 @@ before_script:
       ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
       GANACHE_PID=$!
       sleep 5
+      truffle migrate
     fi
-  - truffle migrate 
   - cd ..
 
 script: xvfb-run npm test
