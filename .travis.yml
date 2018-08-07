@@ -4,7 +4,7 @@ node_js:
   - v8
 
 before_script:
-  - git clone --depth=1 --branch=master https://github.com/polymath/polymath-core polymath-core
+  - git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
   - cd polymath-core
   - npm install -g truffle
   - npm install
