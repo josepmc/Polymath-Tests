@@ -116,7 +116,7 @@ export = (opts = {}) => {
                     // We can't run chrome in headless when using extensions
                     headless: false,
                     // If we're using command line flags, we can only pass uncompressed directories
-                    extensions: /*['/Users/pasztet/Downloads/metamask-chrome-4.8.0'],*/extensions.map(ex => ex.data.uncompressed),
+                    extensions: extensions.map(ex => ex.data.uncompressed),
                     downloadManager: dlmgr,
                 });
                 let ext = {};
