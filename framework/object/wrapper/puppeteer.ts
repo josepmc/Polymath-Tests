@@ -92,7 +92,7 @@ export class PuppeteerHandle {
         })();
     }
     private tmpDirHandle: tmp.SynchrounousResult;
-    public constructor(private options: PuppeteerOptions = { headless: false }) {
+    public constructor(public options: PuppeteerOptions = { headless: false }) {
         if (!this.options.launchArgs)
             this.options.launchArgs = [
                 '--no-sandbox',

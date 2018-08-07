@@ -1,0 +1,23 @@
+language: node_js
+dist:trusty
+node_js:
+  - v10
+
+before_script:
+  - git clone --depth=1 --branch=master https://github.com/polymath/polymath-core polymath-core
+  - cd polymath-core
+  - npm install -g truffle
+  - npm install
+  - |
+     METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
+     ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET"&
+     GANACHE_PID=$!
+     sleep 5
+  - truffle migrate 
+
+install: yarn
+
+script: METAMASK_NETWORK=l xvfb-run npm test
+
+after_script:
+  - kill -9 $GANACHE_PID

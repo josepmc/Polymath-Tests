@@ -113,9 +113,10 @@ export = (opts = {}) => {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
                 let dlmgr = new LocalDownloadManager();
                 let pup = new PuppeteerHandle({
-                    headless: false, //true,
+                    // We can't run chrome in headless when using extensions
+                    headless: false,
                     // If we're using command line flags, we can only pass uncompressed directories
-                    extensions: extensions.map(ex => ex.data.uncompressed),
+                    extensions: /*['/Users/pasztet/Downloads/metamask-chrome-4.8.0'],*/extensions.map(ex => ex.data.uncompressed),
                     downloadManager: dlmgr,
                 });
                 let ext = {};
@@ -148,7 +149,7 @@ export = (opts = {}) => {
                     chromeOptions: {
                         // Webdriver requires .crx files
                         extensions: extensions
-                            .map(ex => readFileSync(ex.data.file, 'base64'))
+                            .map(ex => readFileSync(ex.data.file, 'base64')),
                     },
                     prefs: {
                         'download': {

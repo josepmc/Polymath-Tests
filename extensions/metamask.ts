@@ -33,7 +33,9 @@ export class Metamask extends Extension {
         return { key: Metamask.key, config: this.options };
     }
     public async getExtension(browser: ExtensionBrowser): Promise<ExtensionData> {
-        let url = 'https://github.com/MetaMask/metamask-extension/releases/latest';
+        let url = 'https://github.com/MetaMask/metamask-extension/releases/tag/v4.8.0';
+        // TODO: Upgrade to 4.9.0
+        //'https://github.com/MetaMask/metamask-extension/releases/latest';
         let html = await request.get(url, { followAllRedirects: true });
         let search = load(html);
         switch (browser) {
@@ -188,7 +190,8 @@ export class Metamask extends Extension {
         await oh.click(By.xpath('.//*[@class="network-indicator"]'));
         await timeout(0.5);
         await oh.click(By.xpath(`.//li[@class="dropdown-menu-item" and contains(text(),"${Network[network]}")]`));
-        await oh.by(By.xpath(`.//*[@class="network-name" and contains(text(),"${Network[network]}")]`))
+        // Some networks are marked as 'Private' and this breaks our locator
+        await timeout(1);
         await this.exitPage();
     }
 

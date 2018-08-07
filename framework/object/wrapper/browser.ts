@@ -339,7 +339,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
             callback(null, await method()))());
     }
 
-    protected _processedConfig: Capabilities;
+    protected _processedConfig: RunnerConfig;
     public getProcessedConfig(force?: boolean) {
         let method = this.oldMethods.getProcessedConfig;
         return (!force && this._processedConfig) || (this._processedConfig = deasync(async callback =>
@@ -592,6 +592,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
         await this.switchTo().window(ah[ah.length - 1]);
         await this.waitFor(() => this.getWindowHandle()
             .then(handle => handle === ah[ah.length - 1]), `Timeout: Waiting for the window to be changed`);
+        this.cache.currentWindow = new WindowInfo(ah[ah.length - 1], [null]);
         return currentHandle;
     }
 
@@ -725,7 +726,10 @@ export class ChromeWrapper extends BrowserWrapper {
         this.runtimeFlags = deasync(async cb => { cb(null, await this.fetchRuntimeArgs(browser)); })();
     }
     public async setup(config: RunnerConfig): Promise<void> {
-        await super.setup(config)
+        await super.setup(config);
+        if (this.headless && config.extraConfig && config.extraConfig.extensions) {
+            console.warn(`WARNING! Extensions won't be loaded in chrome headless. See https://github.com/GoogleChrome/puppeteer/issues/659 for more information.`)
+        }
     }
     public async setDownloadBehaviour() {
         if (this.downloadManager) {
@@ -761,6 +765,9 @@ export class PuppeteerWrapper extends ChromeWrapper {
     }
     public get runtimeFlags(): string {
         return this.handle.runtimeArgs;
+    }
+    public get headless(): boolean {
+        return this.handle.options.headless || super.headless;
     }
     public set runtimeFlags(val: string) { }
     public async fetchRuntimeArgs(): Promise<string> {
