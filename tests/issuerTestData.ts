@@ -5,6 +5,7 @@ import { TokenInfoModel } from "models/tokenInfo";
 import { EmailHandler } from "helpers/email";
 import { TestConfig } from "framework/helpers";
 import { WhitelistModel } from "models/whitelistModel";
+import { MintData } from "models/mint";
 
 // Defines a Token and all the related information
 export class IssuerTestData {
@@ -26,5 +27,6 @@ export class IssuerTestData {
 
     public email: EmailHandler = new EmailHandler(TestConfig.instance.protractorConfig.emailConfig);
 
+    public mint: MintData = new MintData();
     public whitelist: WhitelistModel = new WhitelistModel();
 }

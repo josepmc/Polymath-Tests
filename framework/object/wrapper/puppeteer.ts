@@ -1,16 +1,27 @@
-import * as puppeteer from 'puppeteer';
+import * as pup from 'puppeteer-extra';
+import { Browser, LaunchOptions } from 'puppeteer';
+const puppeteer: {
+    Browser: Browser;
+    executablePath(): string;
+    launch(options?: LaunchOptions): Promise<Browser>;
+    use(Function);
+    plugins: Array<Object>;
+    pluginNames: Array<string>;
+} = pup;
 import deasync = require('deasync');
 import { randomBytes } from 'crypto';
 import { ISize } from 'selenium-webdriver';
 import * as tmp from 'tmp';
 import * as rimraf from 'rimraf';
 import { ProtractorBrowser } from 'protractor';
+import { DownloadManager } from 'config/download/abstract';
 
 export interface PuppeteerOptions {
     headless?: boolean;
     launchArgs?: string[];
     userDataDir?: string;
     extensions?: string[];
+    downloadManager?: DownloadManager;
 }
 
 // Eventually we need to move towards a multiple extensions model
@@ -35,7 +46,7 @@ export class PuppeteerHandle {
     public get debuggerPort(): number {
         return parseInt(/:(\d+)/.exec(this.address)[1]);
     }
-    public browser: puppeteer.Browser;
+    public browser: Browser;
     private static tearDown() {
         for (let pup of this.registeredInstances) { deasync(callback => pup.quit().then(callback))(); }
     }
@@ -62,7 +73,7 @@ export class PuppeteerHandle {
         }
         return found;
     }
-    private static createInstance(options: PuppeteerOptions): puppeteer.Browser {
+    private static createInstance(options: PuppeteerOptions): Browser {
         let opts = {
             headless: options.headless,
             ignoreHTTPSErrors: true,
@@ -112,6 +123,17 @@ export class PuppeteerHandle {
         if (this.options.extensions) {
             for (let extension of this.options.extensions)
                 this.options.launchArgs.push(`--load-extension=${extension}`);
+        }
+        if (this.options.downloadManager) {
+            puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
+                userPrefs: {
+                    'download': {
+                        'prompt_for_download': false,
+                        'default_directory': this.options.downloadManager.downloadPath(),
+                        'directory_upgrade': true
+                    }
+                }
+            }))
         }
         this.browser = PuppeteerHandle.createInstance(this.options);
         console.log(`Puppeteer: Started! You can connect using devtools on the following address: ${this.address}`);

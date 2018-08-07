@@ -12,9 +12,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Installation
 
+We only support yarn installs, npm install will inevitably fail.
 ```
 git clone git@github.com:josepmc/issuer-test.git
-$ npm install
+$ yarn
 $ npm test
 ```
 The following environment variables are required for the tests to work:

@@ -1,28 +1,44 @@
 import { IDataModelObject } from "framework/object/core";
 import { oh } from "framework/helpers";
-import { EthAddress } from "models/ethGenerator";
+import { ComplianceItem } from "models/whitelistModel";
+import * as csv from 'csvtojson';
+import * as tmp from 'tmp';
+import * as fs from 'fs';
 
-
-class ComplianceItem {
-    public ethAddress: string = EthAddress.Generate().address;
-    public sellLockup: string = oh.chance.date({ american: true });
-    public buyLockup: string = oh.chance.date({ american: true });
-    public kyc: string = oh.chance.date({ american: true });
-    public static toCSV(this: ComplianceItem): string {
-        return `${this.ethAddress},${this.sellLockup},${this.buyLockup},${this.kyc}`;
-    }
-}
 
 class MintItem extends ComplianceItem {
-    public amount: number = oh.chance.natural();
-    public static toCSV(this: MintItem): string {
-        return `${ComplianceItem.toCSV.apply(this)},${this.amount}`;
+    public amount: number;
+    public toCSV(): string {
+        return `${super.toCSV()},${this.amount}`;
+    }
+    constructor(baseObject?: Object, nullable?: boolean) {
+        super(baseObject, nullable);
+        baseObject = baseObject || {};
+        this.amount = parseFloat(baseObject['Minted']) || oh.chance.natural();
+    }
+    public static async fromCsv(text: string | Object): Promise<MintItem> {
+        return ComplianceItem.fromCsv.call(MintItem, text);
     }
 }
 
 export class MintData extends IDataModelObject {
-    public addresses: MintItem[] = oh.chance.n(() => new MintItem, oh.chance.natural({ min: 1 }));
-    public static toCSV(this: MintData): string {
-        return this.addresses.map(MintItem.toCSV).join('\n');
+    public addresses: MintItem[];
+    public static async fromCsv(text: string): Promise<MintData> {
+        let res = await csv().fromString(text);
+        return new MintData({ addresses: await Promise.all(res.map(r => MintItem.fromCsv(r))) });
+    }
+    constructor(baseObject?: Object, nullable?: boolean) {
+        super(baseObject, nullable);
+        if (!baseObject) {
+            this.addresses = oh.chance.n(() => new MintItem(), oh.chance.natural({ min: 1, max: 10 }));
+        }
+    }
+    public toCSV(): string {
+        return this.addresses.map(item => item.toCSV()).join('\n');
+    }
+    public toFile(): string {
+        let file = tmp.fileSync({ prefix: 'compliance-', postfix: '.csv' });
+        fs.writeFileSync(file.fd, this.toCSV());
+        return file.name;
     }
 }

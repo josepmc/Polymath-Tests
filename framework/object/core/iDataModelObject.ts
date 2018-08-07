@@ -1,7 +1,7 @@
 import { optionalSymbol } from './definition';
 import * as extend from 'extend';
 import { isMetadataField } from './shared';
-import { IConstructor, propertyDescriptor } from './iConstructor';
+import { IConstructor, propertyDescriptor, CompareOptions } from './iConstructor';
 import { oh } from '../../helpers';
 
 export abstract class IDataModelObject extends IConstructor {
@@ -28,5 +28,9 @@ export abstract class IDataModelObject extends IConstructor {
             } else mandatory.push(property);
         }
         return { optional: optional, mandatory: mandatory };
+    }
+    public async _equals<T extends IConstructor>(param: T, opts: CompareOptions): Promise<boolean> {
+        if (opts.ignoreMetadata === undefined) opts.ignoreMetadata = true;
+        return super._equals(param, opts);
     }
 }

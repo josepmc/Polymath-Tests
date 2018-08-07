@@ -2,7 +2,6 @@ import { injectable } from "framework/object/core/iConstructor";
 import { Locator, By, oh } from "framework/helpers";
 import { AbstractFeature } from "framework/object/abstract";
 import { inputField } from "framework/object/core/decorators";
-import { BaseSto } from "objects/pages/withToken/sto/abstract";
 import { Modal } from "objects/features/general/modal";
 
 
@@ -13,7 +12,7 @@ import { Modal } from "objects/features/general/modal";
     public mint(): Promise<Modal> {
         return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--primary")]'), this.element).then(() => Modal.WaitForPage<Modal>(Modal));
     }
-    public skip(): Promise<BaseSto> {
-        return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--secondary")]'), this.element).then(() => BaseSto.WaitForPage(BaseSto) as Promise<BaseSto>);
+    public skip(): Promise<Modal> {
+        return oh.click(By.xpath('.//button[@type="submit" and contains(@class, "bx--btn--secondary")]'), this.element).then(() => Modal.WaitForPage<Modal>(Modal));
     }
 }

@@ -7,9 +7,9 @@
         "node": ">=8.0.0"
     },
     "scripts": {
-        "webdriver-manager": "node_modules/@josepmc/protractor/node_modules/@josepmc/webdriver-manager/bin/webdriver-manager",
+        "webdriver-manager": "webdriver-manager",
         "postinstall": "npm run webdriver-manager -- update",
-        "protractor": "node_modules/@josepmc/protractor/bin/protractor",
+        "protractor": "protractor",
         "test": "npm run protractor -- protractor.conf.js"
     },
     "dependencies": {
@@ -19,6 +19,7 @@
         "@types/chance": "^0.7.35",
         "@types/cheerio": "^0.22.8",
         "@types/clone": "^0.1.30",
+        "@types/csvtojson": "^1.1.5",
         "@types/cucumber": "^4.0.4",
         "@types/deasync": "^0.1.0",
         "@types/extend": "^2.0.30",
@@ -41,6 +42,7 @@
         "cheerio": "^1.0.0-rc.2",
         "clone": "^2.1.1",
         "crx": "git+https://github.com/oncletom/crx.git",
+        "csvtojson": "^2.0.8",
         "cucumber": "^4.2.1",
         "cucumber-pretty": "^1.4.4",
         "cucumber-tsflow": "^2.2.0",
@@ -58,6 +60,9 @@
         "protractor-cucumber-framework": "^6.0.0",
         "protractor-perf": "^0.2.3",
         "puppeteer": "^1.0.0",
+        "puppeteer-extra": "^2.0.7",
+        "puppeteer-extra-plugin-user-data-dir": "^2.0.7",
+        "puppeteer-extra-plugin-user-preferences": "^2.0.7",
         "reflect-metadata": "^0.1.10",
         "request": "^2.87.0",
         "request-promise-native": "^1.0.5",

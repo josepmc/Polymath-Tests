@@ -89,6 +89,10 @@ export interface CompareOptions {
      */
     differenceArray?: Object;
     /**
+     * Don't compare only metadata fields
+     */
+    ignoreMetadata?: boolean;
+    /**
      * Custom compare method for 'leaf' values
      */
     compareFn?: (property: string, thisProperty: Object, thatProperty: Object) => boolean;
@@ -240,6 +244,19 @@ export abstract class IConstructor<I extends InitOpts = InitOpts> {
         return !!impl.length;
     }
 
+    public async arrayEquals<T>(arr1: Array<T>, arr2: Array<T>, opts?: CompareOptions): Promise<boolean> {
+        if (arr1.length !== arr2.length) return false;
+        for (let i = 0; i < arr1.length; ++i) {
+            if (typeof arr1[i] === 'number' && typeof arr2[i] === 'number'
+                && isNaN(arr1[i] as any) && isNaN(arr2[i] as any)) continue;
+            else if (arr1[i] instanceof IConstructor && arr2[i] instanceof IConstructor) {
+                if (!await (arr1[i] as any).equals(arr2[i], opts)) return false;
+            }
+            else if (arr1[i] !== arr2[i]) return false;
+        }
+        return true;
+    }
+
     /**
      * This method compares the current class with another IConstructor class, and returns whether they have the same values in the fields.
      * You should also call this method from the object that has the 'least' amount of fields you want to compare (e.g. call it from a DO, not from a PO)
@@ -254,7 +271,7 @@ export abstract class IConstructor<I extends InitOpts = InitOpts> {
         for (let property of this.sortProperties()) {
             //if (!allEquals) break;
             let localEqual = true;
-            if (Reflect.getMetadata(internalKey, this, property) || isMetadataField(property)) continue;
+            if (Reflect.getMetadata(internalKey, this, property) || (!opts.ignoreMetadata && isMetadataField(property))) continue;
             let descriptor = propertyDescriptor(this, property);
             if (!descriptor) debugger;
             if (descriptor.value instanceof Function) continue;
@@ -271,7 +288,7 @@ export abstract class IConstructor<I extends InitOpts = InitOpts> {
                 if (localEqual && this.isMethodOverriden('equals', paramProperty) && thisProperty.equals !== paramProperty.equals)
                     localEqual = await paramProperty.equals(thisProperty, newOpts);
             } else if (thisProperty instanceof Array && paramProperty instanceof Array) {
-                localEqual = oh.arrayEquals(thisProperty, paramProperty);
+                localEqual = await this.arrayEquals(thisProperty, paramProperty, opts);
             } else {
                 if (opts.compareFn) localEqual = opts.compareFn(property, thisProperty, paramProperty);
                 else if (typeof thisProperty === 'string' || thisProperty instanceof String) {

@@ -3,6 +3,11 @@ import * as tmp from 'tmp';
 import { sync as rmdir } from 'rimraf';
 import { sync as glob } from 'glob';
 import * as fs from 'fs';
+import * as path from 'path';
+
+enum FileStatus {
+    Modified, NoFile, Created, Deleted
+}
 
 export class LocalDownloadManager extends DownloadManager {
     public static UUID: string = 'LOCAL_DOWNLOAD_MANAGER';
@@ -36,8 +41,23 @@ export class LocalDownloadManager extends DownloadManager {
         return files;
     }
 
-    public waitForDownload(filter: string): Promise<DownloadedFile> {
-        throw new Error("Method not implemented.");
+    public waitForDownload(name: string, maxWait?: number): Promise<DownloadedFile> {
+        let self = this;
+        let secondsBy = 0;
+        return new Promise<DownloadedFile>((r, e) => {
+            const interval = setInterval(function () {
+                if (secondsBy++ >= maxWait) {
+                    clearInterval(interval);
+                    e(`Wait for Download - Timeout waiting for ${name} to appear in ${self.downloadPath()}`);
+                }
+                let found = glob(name, { cwd: self.downloadPath() });
+                if (found.length) {
+                    clearInterval(interval);
+                    let file = path.join(self.downloadPath(), found[0]);
+                    r({ name: file, contents: fs.readFileSync(file, 'utf8') });
+                }
+            }, 1000);
+        });;
     }
 }
 

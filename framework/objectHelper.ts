@@ -353,16 +353,6 @@ export class ObjectHelper {
         };
     }
 
-    public arrayEquals<T>(arr1: Array<T>, arr2: Array<T>) {
-        if (arr1.length !== arr2.length) return false;
-        for (let i = 0; i < arr1.length; ++i) {
-            if (typeof arr1[i] === 'number' && typeof arr2[i] === 'number'
-                && isNaN(arr1[i] as any) && isNaN(arr2[i] as any)) continue;
-            if (arr1[i] !== arr2[i]) return false;
-        }
-        return true;
-    }
-
     public parseDate(date: string): Date {
         let matches = /(\d{2}\/\d{2}\/\d{2,4})/.exec(date);
         if (matches.length < 2) return null;

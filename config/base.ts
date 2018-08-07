@@ -33,6 +33,16 @@ const environments: { [k: string]: RunnerConfig } = {
             port: 993,
             tls: true
         }
+    },
+    production: {
+        baseUrl: 'https://tokenstudio.polymath.network',
+        emailConfig: {
+            user: process.env.GMAIL_USER,
+            password: process.env.GMAIL_PASSWORD,
+            host: "imap.gmail.com",
+            port: 993,
+            tls: true
+        }
     }
 }
 
@@ -101,12 +111,13 @@ export = (opts = {}) => {
         switch (currentEnv.argv.params.browser.toLowerCase() || 'puppeteer') {
             case 'puppeteer': {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
+                let dlmgr = new LocalDownloadManager();
                 let pup = new PuppeteerHandle({
                     headless: false, //true,
                     // If we're using command line flags, we can only pass uncompressed directories
-                    extensions: extensions.map(ex => ex.data.uncompressed)
+                    extensions: extensions.map(ex => ex.data.uncompressed),
+                    downloadManager: dlmgr,
                 });
-                let dlmgr = new LocalDownloadManager();
                 let ext = {};
                 for (let ex of extensions) ext[ex.config.key] = ex.config.config;
                 currentEnv.config.capabilities = {

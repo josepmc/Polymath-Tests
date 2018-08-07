@@ -5,6 +5,7 @@ import { WhitelistModel } from "models/whitelistModel";
 import { Modal } from "objects/features/general/modal";
 import { CorePage } from "../../pages/base";
 import { IssuerTest } from "tests/issuerTest";
+import { DownloadedFile } from "config/download/abstract";
 
 class WhitelistModal extends Modal {
     protected featureSelector: Locator = By.xpath('.//*[contains(@class, "whitelist-import-modal") and contains(@class, "is-visible")]');
@@ -12,7 +13,7 @@ class WhitelistModal extends Modal {
     public async cancel(): Promise<CorePage> {
         return oh.click(By.xpath('.//button[contains(@class, "bx--btn--secondary") and not(@for)]'), this.element).then(() => CorePage.Get(CorePage) as Promise<CorePage>);
     }
-    public upload(file) {
+    public upload(file): Promise<void> {
         return oh.type(By.xpath('.//*[@id="id3"]'), file);
     }
 }
@@ -39,7 +40,12 @@ export class WhitelistFeature extends AbstractFeature implements WhitelistModel 
         await oh.click(By.xpath('.//*[contains(@class,"import-whitelist-btn") and contains(@class, "bx--btn--primary")]'), this.element);
         return new WhitelistModal().load();
     }
-    public async download() {
-        await oh.click(By.xpath('.//*[contains(@class,"import-whitelist-btn") and contains(@class, "bx--btn--secondary")]'), this.element);
+    public async download(acceptAndDownload: boolean = true): Promise<DownloadedFile> {
+        let modal = await oh.click(By.xpath('.//*[contains(@class,"import-whitelist-btn") and contains(@class, "bx--btn--secondary")]'), this.element).then(() => Modal.Get<Modal>(Modal));
+        if (acceptAndDownload) {
+            await modal.next(true);
+            return await oh.browser.downloadManager.waitForDownload("*.csv");
+        }
     }
+    data = undefined;
 }

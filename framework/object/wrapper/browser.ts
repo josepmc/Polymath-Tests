@@ -18,11 +18,12 @@ import {
     ProtractorBy
 } from 'protractor';
 import ProtractorPerf = require('protractor-perf');
-import { ILocation, ISize, promise as WebdriverPromise, IWebDriverOptionsCookie, By as WebdriverBy, Command } from 'selenium-webdriver';
+import { ILocation, ISize, promise as WebdriverPromise, IWebDriverOptionsCookie, By as WebdriverBy } from 'selenium-webdriver';
 import parseDomain = require('parse-domain');
 import { DownloadManager } from 'config/download/abstract';
 const cssHighlight = require('../injectors/cssHighlight');
 const xPathFinder = require('../injectors/xpath');
+const Command = require('selenium-webdriver/lib/command').Command;
 
 export interface Domain {
     domain: string;
@@ -422,6 +423,10 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
             selector = (selector instanceof ElementFinder ? selector : (await this.by(selector, parent, false)));
             return await (selector as ElementFinder).isPresent();
         } catch (err) {
+            if (err.name === "NoSuchWindowError") {
+                await this.switchToFrame(await this.currentFrame());
+                return this.present(selector, parent);
+            }
             // This 'catch' is not a safeguard, it often means that the locator is invalid
             let errorSelector = selector;
             let errorParent = parent;
@@ -720,11 +725,24 @@ export class ChromeWrapper extends BrowserWrapper {
         this.runtimeFlags = deasync(async cb => { cb(null, await this.fetchRuntimeArgs(browser)); })();
     }
     public async setup(config: RunnerConfig): Promise<void> {
-        super.setup(config)
-        if (this.headless && this.downloadManager) {
-            let cmd = new Command('send_command');
-            cmd.setParameters({ 'cmd': 'Page.setDownloadBehavior', 'params': { 'behavior': 'allow', 'downloadPath': this.downloadManager.downloadPath() } });
-            await this.driver.schedule(cmd, 'Set the download strategy for Chrome headless');
+        await super.setup(config)
+    }
+    public async setDownloadBehaviour() {
+        if (this.downloadManager) {
+            /*let cmd = new Command('SEND_COMMAND');
+            cmd.setParameters({
+                'cmd': 'Page.setDownloadBehavior', 'params':
+                {
+                    'behavior': 'allow',
+                    // If this path is not relative (e.g. starts with ./), chrome will FREEZE
+                    'downloadPath': this.downloadManager.downloadPath()
+                }
+            });
+            (this.driver as any).executor_.defineCommand(
+                'SEND_COMMAND',
+                'POST',
+                '/session/:sessionId/chromium/send_command');
+            await this.driver.schedule(cmd, 'Set the download strategy for Chrome headless');*/
         }
     }
     protected static readonly MAX_WIDTH = 1080;
@@ -794,6 +812,9 @@ export class PuppeteerWrapper extends ChromeWrapper {
             return this;
         };
         return fn();
+    }
+    public async setup(config: RunnerConfig) {
+        await super.setup(config);
     }
 }
 
