@@ -15,10 +15,12 @@ before_script:
     if [ ${METAMASK_NETWORK+x} ]; then
       METAMASK_NETWORK=l
     fi
-    ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET"&
+  - |
+    ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
     GANACHE_PID=$!
     sleep 5
   - truffle migrate 
+  - cd ..
 
 install: yarn
 
