@@ -11,3 +11,4 @@ Feature: Compliance test
     Scenario: Modify whitelist positive path
         Given The issuer changes ownership settings
         And The issuer adds investors to the whitelist
+        Then The issuer downloads the same investors

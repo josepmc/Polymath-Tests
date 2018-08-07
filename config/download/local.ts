@@ -42,6 +42,7 @@ export class LocalDownloadManager extends DownloadManager {
     }
 
     public waitForDownload(name: string, maxWait?: number): Promise<DownloadedFile> {
+        console.log(`Waiting for download with filter '${name}' on ${this.downloadPath()}`);
         let self = this;
         let secondsBy = 0;
         return new Promise<DownloadedFile>((r, e) => {

@@ -125,6 +125,7 @@ export class PuppeteerHandle {
                 this.options.launchArgs.push(`--load-extension=${extension}`);
         }
         if (this.options.downloadManager) {
+            console.log(`Puppeteer: Downloading to ${this.options.downloadManager.downloadPath()}`);
             puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
                 userPrefs: {
                     'download': {
