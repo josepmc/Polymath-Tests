@@ -22,13 +22,18 @@ before_script:
       METAMASK_NETWORK=l
     fi
   - |
-    ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
-    GANACHE_PID=$!
-    sleep 5
+    if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
+      ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
+      GANACHE_PID=$!
+      sleep 5
+    fi
   - truffle migrate 
   - cd ..
 
 script: xvfb-run npm test
 
 after_script:
-  - kill -9 $GANACHE_PID
+  - |
+    if [ "${GANACHE_PID+x}" ]; then
+      kill -9 $GANACHE_PID
+    fi

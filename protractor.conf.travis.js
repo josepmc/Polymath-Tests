@@ -1,6 +1,9 @@
 let baseConfig = require('./config/register')({
     env: 'production',
-    browser: 'puppeteer'
+    params: {
+        browser: 'puppeteer',
+        extensions: 'metamask'
+    }
 });
 
 exports.config = {
