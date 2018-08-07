@@ -108,7 +108,7 @@ export = (opts = {}) => {
             },
             ...environments[currentEnv.argv.env || 'local']
         };
-        switch (currentEnv.argv.params.browser.toLowerCase() || 'puppeteer') {
+        switch ((currentEnv.argv.params.browser && currentEnv.argv.params.browser.toLowerCase()) || 'puppeteer') {
             case 'puppeteer': {
                 let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
                 let dlmgr = new LocalDownloadManager();
