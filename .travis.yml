@@ -27,8 +27,8 @@ before_script:
       GANACHE_PID=$!
       sleep 5
       truffle migrate
+      cd ..
     fi
-  - cd ..
 
 script: xvfb-run npm test
 
