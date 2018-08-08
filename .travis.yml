@@ -30,13 +30,14 @@ before_script:
       cd ..
     fi
 
-script: xvfb-run npm test
+script: xvfb-run --server-args="-screen 0, 1920x1080x24" npm test
 
 after_script:
   - |
     if [ "${GANACHE_PID+x}" ]; then
       kill -9 $GANACHE_PID
     fi
+  - bash trigger.sh
 
 notifications:
   email:
