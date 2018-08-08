@@ -633,6 +633,10 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
         let result = await this.wait(async () => {
             return await fn.call(_);
         }, timeout, text).catch(async error => {
+            if (error.name = "NoSuchWindowError") {
+                await this.switchToFrame(await this.currentFrame());
+                return await fn.call(_);
+            }
             if (throwAfterTimeout) {
                 let pre_error = error;
                 debugger;
