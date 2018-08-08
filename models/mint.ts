@@ -1,5 +1,5 @@
 import { IDataModelObject } from "framework/object/core";
-import { oh } from "framework/helpers";
+import { oh, NumberRange } from "framework/helpers";
 import { ComplianceItem } from "models/whitelistModel";
 import * as csv from 'csvtojson';
 import * as tmp from 'tmp';
@@ -27,10 +27,10 @@ export class MintData extends IDataModelObject {
         let res = await csv().fromString(text);
         return new MintData({ addresses: await Promise.all(res.map(r => MintItem.fromCsv(r))) });
     }
-    constructor(baseObject?: Object, nullable?: boolean) {
+    constructor(baseObject?: Object, nullable?: boolean, generateAmount: NumberRange = { minimum: 1, maximum: 10 }) {
         super(baseObject, nullable);
         if (!baseObject) {
-            this.addresses = oh.chance.n(() => new MintItem(), oh.chance.natural({ min: 1, max: 10 }));
+            this.addresses = oh.chance.n(() => new MintItem(), oh.chance.natural({ min: generateAmount.minimum, max: generateAmount.maximum }));
         }
     }
     public toCSV(): string {
