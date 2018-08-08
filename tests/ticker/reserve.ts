@@ -27,7 +27,7 @@ class ReserveToken extends AccountCreation {
     @then(/The issuer has the token reserved/)
     public async tokenIsReserved() {
         let page = await CorePage.Get(CorePage);
-        //expect(page).to.be.instanceof(PageWithToken);
+        expect(page).to.be.instanceof(PageWithToken);
     }
 
     @given(/A token is reserved/)
