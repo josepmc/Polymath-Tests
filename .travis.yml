@@ -37,3 +37,7 @@ after_script:
     if [ "${GANACHE_PID+x}" ]; then
       kill -9 $GANACHE_PID
     fi
+
+notifications:
+  email:
+    - josep@polymath.network

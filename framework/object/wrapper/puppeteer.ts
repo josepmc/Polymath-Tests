@@ -73,18 +73,21 @@ export class PuppeteerHandle {
         }
         return found;
     }
-    private static createInstance(options: PuppeteerOptions): Browser {
+    private createInstance(options: PuppeteerOptions): Browser {
         let opts = {
             headless: options.headless,
             ignoreHTTPSErrors: true,
             userDataDir: options.userDataDir,
-            args: (puppeteer as any).defaultArgs().filter(arg => arg !== '--disable-extensions')
-                .concat(options.launchArgs),
-            ignoreDefaultArgs: true
+            args: options.launchArgs,
+            ignoreDefaultArgs: true,
+            defaultViewport: null
         };
         return deasync(callback => {
             let tries = 0;
-            let fn = () => puppeteer.launch(opts).then(res => callback(null, res)).catch(err => {
+            let fn = () => puppeteer.launch(opts).then(async res => {
+                for (let page of await res.pages()) page.setViewport(this.size);
+                callback(null, res);
+            }).catch(err => {
                 if (tries < 10) return fn();
                 else callback(err);
             });
@@ -95,6 +98,7 @@ export class PuppeteerHandle {
     public constructor(public options: PuppeteerOptions = { headless: false }) {
         if (!this.options.launchArgs)
             this.options.launchArgs = [
+                ...'--disable-background-networking --disable-background-timer-throttling --disable-breakpad --disable-client-side-phishing-detection --disable-default-apps --disable-dev-shm-usage --disable-features=site-per-process --disable-hang-monitor --disable-popup-blocking --disable-prompt-on-repost --disable-sync --disable-translate --metrics-recording-only --no-first-run --safebrowsing-disable-auto-update --enable-automation --password-store=basic --use-mock-keychain --hide-scrollbars'.split(' '),
                 '--no-sandbox',
                 '--no-proxy-server',
                 '--ignore-certificate-errors',
@@ -136,7 +140,7 @@ export class PuppeteerHandle {
                 }
             }))
         }
-        this.browser = PuppeteerHandle.createInstance(this.options);
+        this.browser = this.createInstance(this.options);
         console.log(`Puppeteer: Started! You can connect using devtools on the following address: ${this.address}`);
     }
     private didQuit: boolean = false;
@@ -162,7 +166,7 @@ export class PuppeteerHandle {
         let idx = this.options.launchArgs.findIndex(el => el.startsWith('--remote-debugging-port'));
         if (idx > 0) this.options.launchArgs.splice(idx, 1);
         this.options.launchArgs = this.options.launchArgs.concat(`--remote-debugging-port=${this.debuggerPort}`)
-        this.browser = PuppeteerHandle.createInstance(this.options);
+        this.browser = this.createInstance(this.options);
         console.log(`Chrome Headless - Restarted, available on ${this.address}`);
     }
 }

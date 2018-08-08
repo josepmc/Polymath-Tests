@@ -9,6 +9,6 @@ let baseConfig = require('./config/register')({
 exports.config = {
     ...baseConfig.config,
     specs: [
-        'tests/compliance/compliance.feature'
+        'tests/compliance/complianceSanity.feature'
     ],
 }

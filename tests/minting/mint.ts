@@ -22,7 +22,7 @@ class MintToken extends IssuerTest {
 
     @then(/The issuer mints new investors/)
     public async investorsAreMinted() {
-        await this.approveTransactions(() => this.page.mint.mint());
+        await this.approveTransactions(() => this.page.mint.mint(), null, false);
         let file = await this.page.tokenInfo.download();
         let data = await MintData.fromCsv(file.contents);
         let eq = await data.equals(this.data.mint);
@@ -33,7 +33,7 @@ class MintToken extends IssuerTest {
     public async skipMinting() {
         this.page = await new MintPage().navigation.navigate(MintPage);
         let modal = await this.page.mint.skip();
-        await modal.next();
+        await modal.next(true);
     }
 
     @given(/Investors are minted/)

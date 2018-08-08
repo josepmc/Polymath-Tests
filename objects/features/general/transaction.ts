@@ -37,14 +37,14 @@ export enum Status {
 @injectable @forceVisibility export class Transaction extends AbstractFeature {
     protected featureSelector: Locator = By.xpath('.//*[@class="bx--modal-container"][.//*[@class="bx--modal-header__label" and text()="Transaction Processing"]]');
     @inject(TransactionResult, { multiInstance: true }) public transactions: TransactionResult[];
-    public async next(): Promise<CorePage | TransactionResult> {
+    public async next(lookForNext: boolean = true): Promise<CorePage | TransactionResult> {
         // If continue is not present, return handleTransaction(true)
         let button = By.xpath('.//*[@class="pui-tx-continue"]/button');
         if (await oh.visible(button)()) {
             await oh.click(button);
-            return await CorePage.WaitForPage(CorePage) as CorePage;
-        }
-        return await this.handleTransaction();
+            if (lookForNext) return await CorePage.WaitForPage(CorePage) as CorePage;
+            else return null;
+        } else return await this.handleTransaction();
     }
     public async handleTransaction(cancel: boolean = false): Promise<TransactionResult> {
         // TODO: Implement transaction cancelling

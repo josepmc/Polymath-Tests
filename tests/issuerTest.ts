@@ -5,7 +5,7 @@ import { AbstractPage } from "framework/object/abstract";
 
 export class IssuerTest {
     constructor(public data: IssuerTestData) { }
-    public static async ApproveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
+    public static async ApproveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal, lookForNext: boolean = true): Promise<AbstractPage> {
         let modal = openModal || await clickFn();
         if (!modal) debugger;
         let transaction = await modal.next();
@@ -18,10 +18,10 @@ export class IssuerTest {
             } else transaction = await transaction.next();
         }
         let result;
-        while ((result = await transaction.next()) instanceof TransactionResult) { }
+        while ((result = await transaction.next(lookForNext)) instanceof TransactionResult) { }
         return result;
     }
-    public async approveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal): Promise<AbstractPage> {
-        return IssuerTest.ApproveTransactions(clickFn, openModal);
+    public async approveTransactions(clickFn: () => Promise<Modal>, openModal?: Modal, lookForNext: boolean = true): Promise<AbstractPage> {
+        return IssuerTest.ApproveTransactions(clickFn, openModal, lookForNext);
     }
 }

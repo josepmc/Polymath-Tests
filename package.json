@@ -47,7 +47,6 @@
         "cucumber": "^4.2.1",
         "cucumber-pretty": "^1.4.4",
         "cucumber-tsflow": "^2.2.0",
-        "dappeteer": "git+https://github.com/josepmc/dappeteer.git",
         "deasync": "^0.1.10",
         "extend": "^3.0.1",
         "glob": "^7.1.2",

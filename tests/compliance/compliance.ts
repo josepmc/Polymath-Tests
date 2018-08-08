@@ -37,7 +37,12 @@ class ComplianceTest extends IssuerTest {
         let whitelist = await new Whitelist().load();
         let file = await whitelist.whitelist.download();
         let data = await ComplianceData.fromCsv(file.contents);
+        let old = this.data.whitelist.data.addresses;
+        let combined = this.data.mint.addresses.concat(this.data.whitelist.data.addresses as any);
+        // TODO: Look for duplicates
+        this.data.whitelist.data.addresses = combined;
         let eq = await data.equals(this.data.whitelist.data);
+        this.data.whitelist.data.addresses = old;
         expect(eq, 'Investors data is not the same as uploaded').to.be.true;
     }
 
