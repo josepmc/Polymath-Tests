@@ -10,10 +10,6 @@ before_install:
 install: yarn
 
 before_script:
-  - git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
-  - cd polymath-core
-  - npm install -g truffle
-  - npm install
   - |
     if [ -z "${METAMASK_SECRET+x}" ]; then
       METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
@@ -23,6 +19,10 @@ before_script:
     fi
   - |
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
+      git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
+      cd polymath-core
+      npm install -g truffle
+      npm install
       ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
       GANACHE_PID=$!
       sleep 5
