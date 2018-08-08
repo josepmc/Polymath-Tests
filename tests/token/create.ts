@@ -17,6 +17,8 @@ class CreateTokenTest extends IssuerTest {
         let modal = await providers.createToken.next();
         await modal.next(true); // I consulted with my advisors
         let page = await new CreateToken().navigation.navigate(CreateToken);
+        page = await CreateToken.Get<CreateToken>(CreateToken);
+        await page.init();
         expect(page).to.be.instanceof(CreateToken);
         await page.create.fill(this.data.tokenInfo);
         await this.approveTransactions(() => page.create.next());
