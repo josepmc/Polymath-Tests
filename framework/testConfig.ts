@@ -17,6 +17,7 @@ export class TestConfig {
     }
 
     public static get instance(): TestConfig {
+        if (!oh) return null;
         // Instance is going to differ based on the browser
         let caps = oh.browser.getCapabilities();
         let cfgcaps: TestConfig = caps.get(this.capabilityKey);

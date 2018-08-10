@@ -2,7 +2,6 @@ import { injectable } from "framework/object/core/iConstructor";
 import { Locator, By, oh } from "framework/helpers";
 import { label, present, inputField, comboBox, ClickMode, LabelOptsMode, order } from "framework/object/core/decorators";
 import { StoConfig, StoWidget } from "./abstract";
-import { PageWithToken } from "objects/pages/withToken/base";
 import { CappedStoConfigModel, AmPm, RaiseIn } from "models/cappedStoConfig";
 import { Modal } from "objects/features/general/modal";
 

@@ -1,3 +1,4 @@
+@mint @sanity
 Feature: Mint test
     This is the test related to the mint a token Feature
 

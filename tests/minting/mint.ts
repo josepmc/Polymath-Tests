@@ -14,7 +14,7 @@ class MintToken extends IssuerTest {
     @given(/The issuer adds minting data( with default data)?/)
     public async startNewMinting(defaultData?: string) {
         this.page = await new MintPage().navigation.navigate(MintPage);
-        expect(this.page).to.be.instanceof(MintPage);
+        expect(this.page).to.be.instanceof(MintPage, `Expected to navigate to a Mint Page`);
         if (defaultData) this.data.mint = await MintData.fromCsv(readFileSync(join(__dirname, 'file.csv'), 'utf8'));
         this.page.mint.file = this.data.mint.toFile();
         await this.page.apply();
@@ -23,7 +23,7 @@ class MintToken extends IssuerTest {
     @given(/The issuer adds (\d+) investors to mint/)
     public async generateInvestors(generateInvestors: number) {
         this.page = await new MintPage().navigation.navigate(MintPage);
-        expect(this.page).to.be.instanceof(MintPage);
+        expect(this.page).to.be.instanceof(MintPage, `Expected to navigate to a Mint Page`);
         let prefix = EthAddress.prefix;
         EthAddress.prefix = '';
         let addresses = [];

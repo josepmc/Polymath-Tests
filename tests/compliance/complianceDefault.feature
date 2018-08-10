@@ -1,3 +1,4 @@
+@whitelist
 Feature: Compliance test
     This is the test related to the mint a token Feature
 

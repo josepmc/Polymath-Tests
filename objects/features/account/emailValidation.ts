@@ -1,7 +1,6 @@
 import { AbstractFeature } from "framework/object/abstract";
 import { Locator, By, oh } from "framework/helpers";
 import { inputField } from "framework/object/core/decorators";
-import { PageWithToken } from "objects/pages/withToken/base";
 import { EmailHandler } from "helpers/email";
 import { VerificationEmail } from "objects/pages/emails/verification";
 import { CorePage } from "objects/pages/base";

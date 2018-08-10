@@ -1,3 +1,4 @@
+@sign @sanity @full
 Feature: Sign test
     This is the test related to the sign Feature
 

@@ -47,6 +47,11 @@ export interface AbstractObjectInitOpts extends InitOpts {
     throwAfterTimeout?: boolean;
 }
 
+export interface WaitOptions {
+    resetCache?: boolean;
+    refreshOnNotFound?: boolean;
+}
+
 export abstract class AbstractObject<I extends AbstractObjectInitOpts = AbstractObjectInitOpts> extends IImplementable<I> {
     @internal public mandatoryLocator: Locator = null;
     @internal public optionalLocator: Locator = null;
@@ -234,16 +239,20 @@ export abstract class AbstractObject<I extends AbstractObjectInitOpts = Abstract
     }
 
     public static async WaitForPage<T extends IImplementable>(pages: any[] | any,
-        resetCache: boolean = true, ...args): Promise<T> {
+        options: WaitOptions | boolean = true, ...args): Promise<T> {
         if (!(pages instanceof Array)) pages = [pages];
         return await oh.wait(async () => {
             for (let page of pages) {
-                if (resetCache) oh.browser.resetCache();
+                if (options === true || (options && (options as WaitOptions).resetCache)) oh.browser.resetCache();
                 let res;
                 if (this.findMatching(page)) res = await IConstructor.Get(page, args);
                 else res = await (new (Function.prototype.bind.apply(page, [null].concat(args))))
                     .init(<AbstractObjectInitOpts>{ mode: InitMode.SingleObject, timeout: 1000, throwAfterTimeout: false });
                 if (res) return res as T;
+                if (options && (options as WaitOptions).refreshOnNotFound) {
+                    await oh.refresh();
+                    await oh.browser.sleep(0.5);
+                }
             }
             return null;
         }, `PageObject - Error! Timeout waiting for one of the pages to load`);
