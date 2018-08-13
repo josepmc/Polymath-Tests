@@ -13,11 +13,10 @@ install: yarn
 
 before_script:
   - |
-    if [ -z "${METAMASK_SECRET+x}" ]; then
-      METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
-    fi
     if [ -z "${METAMASK_NETWORK+x}" ]; then
+      METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
       METAMASK_NETWORK=l
+      GANACHE_NETWORK=100000015
     fi
   - |
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
@@ -25,10 +24,11 @@ before_script:
       cd polymath-core
       npm install -g truffle
       npm install
-      ganache-cli -i 15 -l 9000000 -m "$METAMASK_SECRET" > ganache.log &
+      ganache-cli -i $GANACHE_NETWORK -l 9000000 -m "$METAMASK_SECRET" > ../ganache.log &
       GANACHE_PID=$!
       sleep 5
-      truffle migrate
+      GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/----- Polymath Core Contracts -----/ d; /^-*\$/,\$d; s/Address//g; s/[\* ]*//g; s/^[\* ]*\([^:]*\): *\([^ ]*\)[ \*]*/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
+      cat migration.log
       cd ..
     fi
 
@@ -38,6 +38,7 @@ after_script:
   - |
     if [ "${GANACHE_PID+x}" ]; then
       kill -9 $GANACHE_PID
+      cat ganache.log
     fi
   - bash trigger.sh
 

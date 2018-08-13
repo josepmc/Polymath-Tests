@@ -1,5 +1,5 @@
 import { After, HookScenarioResult, World, Status, setDefaultTimeout, Before } from 'cucumber';
-import { oh } from 'framework/helpers';
+import { oh, WindowInfo } from 'framework/helpers';
 import { Metamask, Network } from 'extensions/metamask';
 
 process.on('uncaughtException', function (err) {
@@ -19,6 +19,12 @@ let find = function (en: Object, name: string): string {
 Before(async function (this: World, scenario: HookScenarioResult) {
     // TODO: Make this browser independent
     // TODO: Implement automatic startup
+    // Skip metamask window if it's open
+    let def = await oh.browser.defaultFrame();
+    for (let h of (await oh.browser.getAllWindowHandles()).filter(h => def.windowHandle != h)) {
+        await oh.browser.switchToFrame(new WindowInfo(h, [null]));
+        await oh.browser.window().close();
+    }
     let secret = process.env.METAMASK_SECRET;
     if (!secret) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_SECRET' for the tests to work`;
     await Metamask.instance.importAccount(secret);

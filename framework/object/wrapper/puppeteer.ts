@@ -132,6 +132,7 @@ export class PuppeteerHandle {
             console.log(`Puppeteer: Downloading to ${this.options.downloadManager.downloadPath()}`);
             puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
                 userPrefs: {
+                    "profile.default_content_settings.cookies": 0,
                     'download': {
                         'prompt_for_download': false,
                         'default_directory': this.options.downloadManager.downloadPath(),

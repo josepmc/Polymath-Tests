@@ -153,6 +153,7 @@ export = (opts = {}) => {
                             .map(ex => readFileSync(ex.data.file, 'base64')),
                     },
                     prefs: {
+                        "profile.default_content_settings.cookies": 0,
                         'download': {
                             'prompt_for_download': false,
                             'default_directory': dlmgr.downloadPath(),
@@ -180,6 +181,7 @@ export = (opts = {}) => {
                             extensions.map(ex => readFileSync(ex.data.file, 'base64'))
                     },
                     prefs: {
+                        "profile.default_content_settings.cookies": 0,
                         'download': {
                             'prompt_for_download': false,
                             'default_directory': dlmgr.downloadPath(),
