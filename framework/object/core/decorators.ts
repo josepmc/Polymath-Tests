@@ -55,7 +55,7 @@ export function fillWith(targetProperty: string) {
 }
 
 export enum NumberParseMethod {
-    ParseInt, Number, ParseFloat,
+    ParseInt, Number, ParseFloat, None
 }
 
 export interface CallOpts {
@@ -83,6 +83,8 @@ function parseNumber(value: string, parseMethod: NumberParseMethod): number {
             return parseFloat(value);
         case NumberParseMethod.Number:
             return Number(value);
+        case NumberParseMethod.None:
+            return Number.NaN;
     }
 }
 const holder: Symbol = Symbol('Holder');
