@@ -14,9 +14,9 @@ install: yarn
 before_script:
   - |
     if [ -z "${METAMASK_NETWORK+x}" ]; then
-      METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
-      METAMASK_NETWORK=l
-      GANACHE_NETWORK=100000015
+      export METAMASK_SECRET="cotton trap squeeze wealth aunt fork hungry notice entry early combine chalk"
+      export METAMASK_NETWORK=l
+      export GANACHE_NETWORK=100000015
     fi
   - |
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
@@ -30,7 +30,7 @@ before_script:
       sh -c 'tail -n +0 -f ../ganache.log | { sed "/Listening on/ q" && kill $$ ;}'
       GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
       cat migration.log
-      nvm use latest
+      nvm use v10
       cd ..
     fi
 
