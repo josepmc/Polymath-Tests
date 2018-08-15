@@ -9,7 +9,7 @@
     "author": "Josep Mateu Clemente <jmateu.clemente@gmail.com>",
     "scripts": {
         "webdriver-manager": "webdriver-manager",
-        "postinstall": "npm run webdriver-manager -- update",
+        "postinstall": "npm run webdriver-manager -- update --gecko=false",
         "protractor": "protractor",
         "test": "npm run protractor -- protractor.conf.travis.js"
     },
