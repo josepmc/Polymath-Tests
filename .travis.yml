@@ -2,8 +2,13 @@ language: node_js
 dist: trusty
 node_js:
   - v10
+cache:
+  yarn: true
+  directories:
+  - ~/.npm
 
 before_install:
+  - START_TIME=$(date +%s)
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.7.0
@@ -42,6 +47,16 @@ after_script:
       kill -9 $GANACHE_PID
       cat ganache.log
     fi
+  - |
+    END_TIME=$(date +%s)
+    ELAPSED=$(($END_TIME - $START_TIME))
+    JOB_EXPECTED_TIME=$((60 * 10))
+    # We can trigger scripts maximum 10 times per hour
+    if [[ $ELAPSED < $JOB_EXPECTED_TIME ]]; then
+      TIMELEFT=$((JOB_EXPECTED_TIME - $ELAPSED))
+      echo "Waiting $TIMELEFT seconds to trigger the next job..."
+      sleep $TIMELEFT
+    fi;
   - bash trigger.sh
 
 notifications:
