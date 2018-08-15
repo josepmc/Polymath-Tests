@@ -28,7 +28,7 @@ before_script:
       ganache-cli -i $GANACHE_NETWORK -l 9000000 -m "$METAMASK_SECRET" > ../ganache.log &
       GANACHE_PID=$!
       sh -c 'tail -n +0 -f ../ganache.log | { sed "/Listening on/ q" && kill $$ ;}'
-      GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
+      export GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
       cat migration.log
       nvm use v10
       cd ..
