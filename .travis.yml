@@ -23,8 +23,6 @@ before_script:
       git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
       cd polymath-core
       nvm install v8
-      nvm use v8
-      echo "Using node "$(node -v)
       npm install -g truffle
       npm install
       ganache-cli -i $GANACHE_NETWORK -l 9000000 -m "$METAMASK_SECRET" > ../ganache.log &
@@ -33,7 +31,6 @@ before_script:
       GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
       cat migration.log
       nvm use latest
-      echo "Using node "$(node -v)
       cd ..
     fi
 
