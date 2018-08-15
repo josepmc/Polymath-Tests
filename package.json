@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "license": "MIT",
     "engines": {
-        "node": ">=8.0.0"
+        "node": ">=10.8.0"
     },
     "author": "Josep Mateu Clemente <jmateu.clemente@gmail.com>",
     "scripts": {

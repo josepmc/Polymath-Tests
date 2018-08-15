@@ -17,8 +17,8 @@ class Environment {
     constructor(private opts = {}) {
         this.argv = {
             params: {},
-            ...this.argv,
-            ...opts
+            ...opts,
+            ...this.argv
         }
     }
 }
@@ -76,7 +76,7 @@ export = (opts = {}) => {
         let currentEnv = new Environment(opts);
         currentEnv.config = {
             allScriptsTimeout: 60 * 3600,
-            specs: [''],
+            specs: ['tests/**/*.feature'],
             SELENIUM_PROMISE_MANAGER: false,
             disableChecks: true,
             noGlobals: true,
@@ -93,7 +93,7 @@ export = (opts = {}) => {
                     './objects/**/*.ts',
                     './tests/**/*.ts',
                 ],
-                tags: currentEnv.argv.tags || '',
+                tags: currentEnv.argv.params.tags || '',
                 format: 'progress'
             },
             extensions: {
@@ -105,6 +105,7 @@ export = (opts = {}) => {
                 for (let fn of shutdownFns) await fn();
             },
             params: {
+                ...currentEnv.argv.params,
                 generatorSeed: currentEnv.argv.seed || (Math.random() * Number.MAX_SAFE_INTEGER),
             },
             ...environments[currentEnv.argv.env || 'local']

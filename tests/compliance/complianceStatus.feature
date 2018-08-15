@@ -1,4 +1,4 @@
-@whitelist
+@whitelist @status
 Feature: Compliance test
     This is the test related to the mint a token Feature
 
@@ -6,9 +6,8 @@ Feature: Compliance test
         Given The issuer is authenticated
         And A token is reserved
         And A token is created
-        And Investors are minted
+        And The issuer skips minting
         And Capped STO launched
 
     Scenario: Modify whitelist positive path
         Given The issuer changes ownership settings
-        And The issuer adds investors to the whitelist with default data

@@ -23,7 +23,6 @@ import parseDomain = require('parse-domain');
 import { DownloadManager } from 'config/download/abstract';
 const cssHighlight = require('../injectors/cssHighlight');
 const xPathFinder = require('../injectors/xpath');
-const Command = require('selenium-webdriver/lib/command').Command;
 
 export interface Domain {
     domain: string;
@@ -666,9 +665,18 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
         }, `Timeout: Waiting for the element to load: ${elem.locator()}`);
         return elem;
     }
-    public async scrollTo(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper): Promise<boolean> {
+    public async scrollTo(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper, bruteForce: boolean = false): Promise<boolean> {
         let element = await this.by(selector, parent) as ElementWrapper;
-        await this.executeScript("arguments[0].scrollIntoView( { behavior: 'smooth', block: 'center', inline: 'center' });", await element.getWebElement());
+        if (bruteForce) {
+            await this.executeScript(`
+                let element = arguments[0]
+                const elementRect = element.getBoundingClientRect();
+                const absoluteElementTop = elementRect.top + window.pageYOffset;
+                const middle = absoluteElementTop - (window.innerHeight / 2);
+                window.scrollTo(0, middle);
+            `, element);
+        }
+        else await this.executeScript("arguments[0].scrollIntoView( { behavior: 'smooth', block: 'center', inline: 'center' });", await element.getWebElement());
         return true;
     }
     public visible(locator: Locator | ElementWrapper,
@@ -808,6 +816,7 @@ export class PuppeteerWrapper extends ChromeWrapper {
             let cookies;
             if (restartOpts.CopyCookies) cookies = await this.manage().getCookies();
             await this.handle.restart();
+            await this.switchTo().window((await this.getAllWindowHandles())[0]);
             if (restartOpts.CopyCookies) {
                 await BrowserWrapper.setCookies(cookies, this);
             }
@@ -817,7 +826,6 @@ export class PuppeteerWrapper extends ChromeWrapper {
                 if (!restartOpts.DontCopyPosition) await this.setPosition(position);
                 if (!restartOpts.DontCopySize) await this.setSize(size);
             }
-            await this.switchTo().window((await this.getAllWindowHandles())[0]);
             this.resetCache();
             this.events.emit('restart', this, restartOpts);
             return this;

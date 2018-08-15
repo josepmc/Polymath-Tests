@@ -16,12 +16,16 @@ let find = function (en: Object, name: string): string {
     return null;
 }
 
+let first = true;
 Before(async function (this: World, scenario: HookScenarioResult) {
     // TODO: Make this browser independent
     // TODO: Implement automatic startup
     // Skip metamask window if it's open
+    if (first) first = false;
+    else await oh.restart();
     let def = await oh.browser.defaultFrame();
-    for (let h of (await oh.browser.getAllWindowHandles()).filter(h => def.windowHandle != h)) {
+    let handles = (await oh.browser.getAllWindowHandles()).filter(h => def.windowHandle != h);
+    for (let h of handles) {
         await oh.browser.switchToFrame(new WindowInfo(h, [null]));
         await oh.browser.window().close();
     }
@@ -42,6 +46,6 @@ After(async function (this: World, scenario: HookScenarioResult) {
         let base64 = await oh.browser.takeScreenshot();
         //this.attach(base64, 'image/png');
     }
-    //await oh.restart();
+    // If we restart here we risk a node instakill
 });
 

@@ -101,16 +101,17 @@ export class ObjectHelper {
         return await (await this.by(selector, parent)).inViewport();
     }
 
-    public async scrollTo(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper): Promise<boolean> {
-        return await this.browser.scrollTo(selector, parent);
+    public async scrollTo(selector: Locator | ElementWrapper, parent?: Locator | ElementWrapper, bruteForce: boolean = false): Promise<boolean> {
+        return await this.browser.scrollTo(selector, parent, bruteForce);
     }
 
     public async click(selector: Locator | WebElement | ElementWrapper,
         parent?: Locator | WebElement | ElementWrapper, resetCache: boolean = true, keepIframe: boolean = false, fromMoveClick: boolean = false): Promise<void> {
         let highlightOpts: HighlightOpts = TestConfig.instance.protractorConfig.params.highlight;
         if (TestConfig.instance.protractorConfig.params.highlight && !fromMoveClick) return this.moveClick(selector, parent, resetCache, keepIframe);
+        let el: ElementWrapper;
         try {
-            let el = await this.by(selector, parent);
+            el = await this.by(selector, parent);
             // This is better than the "minimal scroll" from Selenium's implementation (which will just put the element in the viewport)
             if (!await this.inViewport(el)) await this.scrollTo(el);
             assert(await this.visible(el)(), `Click: Can't click a non-visible element (${selector})`);
@@ -118,10 +119,20 @@ export class ObjectHelper {
                 await this.browser.sleep(highlightOpts.delay);
             }
             await el.click();
-            if (resetCache) this.browser.resetCache(keepIframe);
         } catch (err) {
+            if ((err.message as string).indexOf('is not clickable at point') !== -1) {
+                try {
+                    await this.scrollTo(el, null, true);
+                    await el.click();
+                    return;
+                } catch (error) {
+                    debugger;
+                }
+            }
             debugger;
             assert(!err, `Click: An error occurred for ${selector && (selector instanceof ElementFinder ? selector.locator() : selector['value'])}: ${err}`);
+        } finally {
+            if (resetCache) this.browser.resetCache(keepIframe);
         }
     }
 

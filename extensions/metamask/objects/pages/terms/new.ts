@@ -30,7 +30,7 @@ import { Detail } from "../account/detail";
     public async next(lookForNext: boolean = true): Promise<Locked> {
         return oh.click(By.xpath('.//button'), this.element)
             .then(() => lookForNext && Locked
-                .WaitForPage<Locked>([Locked, NewTerms]));
+                .WaitForPage<Locked>([Locked, NewTerms, Detail]));
     }
 }
 

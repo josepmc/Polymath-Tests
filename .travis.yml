@@ -32,7 +32,7 @@ before_script:
       cd ..
     fi
 
-script: npm test
+script: npm test -- --env=production --params.tags=@status
 
 after_script:
   - |

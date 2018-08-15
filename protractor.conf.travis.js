@@ -1,14 +1,8 @@
-let baseConfig = require('./config/register')({
-    env: 'production',
+exports.config = require('./config/register')({
+    env: 'local',
     params: {
         browser: 'puppeteer',
-        extensions: 'metamask'
+        extensions: 'metamask',
+        tags: '@sanity or @status'
     }
-});
-
-exports.config = {
-    ...baseConfig.config,
-    specs: [
-        'tests/compliance/complianceSanity.feature'
-    ],
-}
+}).config;
