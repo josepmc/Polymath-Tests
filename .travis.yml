@@ -2,7 +2,6 @@ language: node_js
 dist: trusty
 node_js:
   - v10
-  - v8
 
 before_install:
   - "export DISPLAY=:99.0"
@@ -23,6 +22,7 @@ before_script:
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
       git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
       cd polymath-core
+      nvm install v8
       nvm use v8
       echo "Using node "$(node -v)
       npm install -g truffle
