@@ -12,11 +12,6 @@ import { Detail } from "./objects/pages/account/detail";
 import { Transaction } from "./objects/pages/transaction";
 
 
-const timeout = seconds =>
-    new Promise(resolve => setTimeout(resolve, seconds * 1000));
-
-
-// TODO: Refactor all of this, making nice pages and such...
 export class Metamask extends Extension {
     private static key: string = 'METAMASK_UNIQUE_CONFIG_KEY';
     public getConfig(): ExtensionConfig {
@@ -63,25 +58,23 @@ export class Metamask extends Extension {
     public exitPage() {
         return oh.browser.window().close(this.window);
     }
-    private termsAccepted = false;
-    public async acceptTerms(exitPage: boolean = true) {
-        this.termsAccepted = true;
+    public async acceptTerms() {
         await this.navigateToPage();
         let page = await TermsAndConditions.WaitForPage<TermsAndConditions>(TermsAndConditions);
         await page.skipTou();
-        if (exitPage) await this.exitPage();
+        await this.exitPage();
     }
     public async createAccount(password: string = "password1234") {
-        if (!this.termsAccepted) await this.acceptTerms(false);
-        else await this.navigateToPage();
-        let page = await Create.WaitForPage<Create>(Create);
+        await this.navigateToPage();
+        let page = await Create.WaitForPage<Create>([Create, TermsAndConditions]);
+        if (page instanceof TermsAndConditions) page = await page.skipTou() as Create;
         await page.fill({ password: password } as any, false);
         await this.exitPage();
     }
     public async importAccount(seed: string, password = 'password1234') {
-        if (!this.termsAccepted) await this.acceptTerms(false);
-        else await this.navigateToPage();
-        let locked = await Locked.WaitForPage<Locked>(Locked);
+        await this.navigateToPage();
+        let locked = await Locked.WaitForPage<Locked>([Locked, TermsAndConditions]);
+        if (locked instanceof TermsAndConditions) locked = await locked.skipTou() as Locked;
         await locked.init();
         let page = await locked.import();
         await page.fill({ password: password, seed: seed } as any, false);

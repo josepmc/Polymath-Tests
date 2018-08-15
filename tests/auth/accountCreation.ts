@@ -1,13 +1,11 @@
 import { IssuerTest } from "tests/issuerTest";
-import { given } from "cucumber-tsflow";
+import { given, binding } from "cucumber-tsflow";
 import { CorePage } from "objects/pages/base";
 import { EmailVerification } from "objects/pages/noToken/account/emailVerification";
-import { PageWithToken } from "objects/pages/withToken/base";
 import { AccountPage } from "objects/pages/noToken/account/createAccount";
-import { Ticker } from "objects/pages/noToken/ticker/ticker";
 import { expect } from "framework/helpers";
 
-
+@binding()
 export class AccountCreation extends IssuerTest {
     @given(/The issuer creates an account/)
     public async createAnAccount() {

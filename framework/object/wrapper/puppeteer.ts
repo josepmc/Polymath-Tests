@@ -5,8 +5,9 @@ const puppeteer: {
     executablePath(): string;
     launch(options?: LaunchOptions): Promise<Browser>;
     use(Function);
-    plugins: Array<Object>;
-    pluginNames: Array<string>;
+    _plugins: { [k: string]: any, name: string }[];
+    readonly plugins: { [k: string]: any, name: string }[];
+    readonly pluginNames: string[];
 } = pup;
 import deasync = require('deasync');
 import { randomBytes } from 'crypto';
@@ -128,21 +129,27 @@ export class PuppeteerHandle {
             for (let extension of this.options.extensions)
                 this.options.launchArgs.push(`--load-extension=${extension}`);
         }
-        if (this.options.downloadManager) {
-            console.log(`Puppeteer: Downloading to ${this.options.downloadManager.downloadPath()}`);
-            puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
-                userPrefs: {
-                    "profile.default_content_settings.cookies": 0,
-                    'download': {
-                        'prompt_for_download': false,
-                        'default_directory': this.options.downloadManager.downloadPath(),
-                        'directory_upgrade': true
-                    }
-                }
-            }))
-        }
+        if (this.options.downloadManager) this.configureDownload();
         this.browser = this.createInstance(this.options);
         console.log(`Puppeteer: Started! You can connect using devtools on the following address: ${this.address}`);
+    }
+    public configureDownload(): void {
+        console.log(`Puppeteer: Downloading to ${this.options.downloadManager.downloadPath()}`);
+        let pluginName = "user-preferences";
+        let idx: number = puppeteer._plugins.findIndex(p => p.name === pluginName);
+        if (idx !== -1) {
+            puppeteer._plugins = puppeteer._plugins.splice(idx, 1);
+        }
+        puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
+            userPrefs: {
+                "profile.default_content_settings.cookies": 0,
+                'download': {
+                    'prompt_for_download': false,
+                    'default_directory': this.options.downloadManager.downloadPath(),
+                    'directory_upgrade': true
+                }
+            }
+        }));
     }
     private didQuit: boolean = false;
     public async quit() {
@@ -166,7 +173,11 @@ export class PuppeteerHandle {
         }
         let idx = this.options.launchArgs.findIndex(el => el.startsWith('--remote-debugging-port'));
         if (idx > 0) this.options.launchArgs.splice(idx, 1);
-        this.options.launchArgs = this.options.launchArgs.concat(`--remote-debugging-port=${this.debuggerPort}`)
+        this.options.launchArgs = this.options.launchArgs.concat(`--remote-debugging-port=${this.debuggerPort}`);
+        if (this.options.downloadManager) {
+            this.options.downloadManager.generateDownloadPath();
+            await this.configureDownload();
+        }
         this.browser = this.createInstance(this.options);
         console.log(`Chrome Headless - Restarted, available on ${this.address}`);
     }

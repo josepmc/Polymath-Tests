@@ -22,13 +22,17 @@ export class LocalDownloadManager extends DownloadManager {
         super(config);
         if (config) this.restoreConfig(config);
         else {
-            this._downloadPath = tmp.dirSync().name;
-            process.on('exit', () => {
-                rmdir(this._downloadPath);
-            });
+            this.generateDownloadPath();
         }
     }
 
+    public generateDownloadPath(): string {
+        this._downloadPath = tmp.dirSync().name;
+        process.on('exit', () => {
+            rmdir(this._downloadPath);
+        });
+        return this._downloadPath;
+    }
     public downloadPath(): string {
         return this._downloadPath;
     }
@@ -43,18 +47,28 @@ export class LocalDownloadManager extends DownloadManager {
 
     public waitForDownload(name: string, maxWait?: number): Promise<DownloadedFile> {
         console.log(`Waiting for download with filter '${name}' on ${this.downloadPath()}`);
-        let self = this;
+        let downloadPath = this.downloadPath();
         let secondsBy = 0;
         return new Promise<DownloadedFile>((r, e) => {
             const interval = setInterval(function () {
                 if (secondsBy++ >= maxWait) {
                     clearInterval(interval);
-                    e(`Wait for Download - Timeout waiting for ${name} to appear in ${self.downloadPath()}`);
+                    e(`Wait for Download - Timeout waiting for ${name} to appear in ${downloadPath}`);
                 }
-                let found = glob(name, { cwd: self.downloadPath() });
+                let found = glob(name, { cwd: downloadPath });
                 if (found.length) {
                     clearInterval(interval);
-                    let file = path.join(self.downloadPath(), found[0]);
+                    found = found.map(name => {
+                        name = path.join(downloadPath, name);
+                        return {
+                            name: name,
+                            modifiedDate: fs.statSync(name).mtime.getTime()
+                        }
+                    }).sort(function (a, b) {
+                        return a.modifiedDate - b.modifiedDate;
+                    }).map(f => f.name);
+                    let file = found[found.length - 1];
+                    console.log(`Found ${found.length} files, last one is ${file}`);
                     r({ name: file, contents: fs.readFileSync(file, 'utf8') });
                 }
             }, 1000);

@@ -10,6 +10,7 @@ export interface DownloadConfig {
 
 export abstract class DownloadManager {
     public abstract downloadPath(): string;
+    public abstract generateDownloadPath(): string;
     public abstract getFiles(globFilter: string): Promise<DownloadedFile[]>;
     public abstract waitForDownload(globFilter: string): Promise<DownloadedFile>;
     public abstract getConfig(): DownloadConfig;

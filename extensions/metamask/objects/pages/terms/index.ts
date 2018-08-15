@@ -11,9 +11,10 @@ export abstract class TermsAndConditions extends MetamaskPage {
             await (await oh.by(By.xpath('.//div[contains(@class, "markdown")]'), this.element))
                 .getWebElement());
     }
-    public async skipTou() {
+    public async skipTou(): Promise<MetamaskPage> {
         let page: TermsAndConditions = this;
         while (page instanceof TermsAndConditions)
             page = await page.next() as TermsAndConditions;
+        return page;
     }
 }

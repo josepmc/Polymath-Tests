@@ -20,15 +20,8 @@ let first = true;
 Before(async function (this: World, scenario: HookScenarioResult) {
     // TODO: Make this browser independent
     // TODO: Implement automatic startup
-    // Skip metamask window if it's open
     if (first) first = false;
     else await oh.restart();
-    let def = await oh.browser.defaultFrame();
-    let handles = (await oh.browser.getAllWindowHandles()).filter(h => def.windowHandle != h);
-    for (let h of handles) {
-        await oh.browser.switchToFrame(new WindowInfo(h, [null]));
-        await oh.browser.window().close();
-    }
     let secret = process.env.METAMASK_SECRET;
     if (!secret) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_SECRET' for the tests to work`;
     await Metamask.instance.importAccount(secret);
@@ -38,6 +31,19 @@ Before(async function (this: World, scenario: HookScenarioResult) {
             await Metamask.instance.switchAccount();
     let info = await Metamask.instance.accountInfo();
     console.log(`INFO: Using '${info.name}' (${info.ethAddress}) with ${info.ethAmount} ETH`);
+
+    let def = await oh.browser.defaultFrame(true);
+    let all = await oh.browser.getAllWindowHandles();
+    let handles = all.filter(h => def.windowHandle != h);
+    if (all.length == handles.length) handles = handles.splice(0, 1);
+    for (let h of handles) {
+        try {
+            await oh.browser.switchToFrame(new WindowInfo(h, [null]));
+            await oh.browser.window().close();
+        } catch (error) {
+            debugger;
+        }
+    }
 });
 
 After(async function (this: World, scenario: HookScenarioResult) {

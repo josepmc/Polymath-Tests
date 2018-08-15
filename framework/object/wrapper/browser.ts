@@ -321,7 +321,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
     public resetCache(keepIframe = false) {
         this.cache.elements = {};
         let currentWindow = this.cache.currentWindow;
-        this.cache.currentWindow = new WindowInfo(null);
+        this.cache.currentWindow = new WindowInfo();
         if (keepIframe) {
             let self = this;
             deasync(async callback => {
@@ -329,6 +329,7 @@ export class BrowserWrapper extends ProtractorBrowser implements OldMethods<Prot
                 callback();
             })();
         }
+        this._position = this._caps = this._size = this._processedConfig = null;
     }
 
     protected _caps: Capabilities;
@@ -826,6 +827,7 @@ export class PuppeteerWrapper extends ChromeWrapper {
                 if (!restartOpts.DontCopyPosition) await this.setPosition(position);
                 if (!restartOpts.DontCopySize) await this.setSize(size);
             }
+            this.downloadManager = this.handle.options.downloadManager;
             this.resetCache();
             this.events.emit('restart', this, restartOpts);
             return this;
