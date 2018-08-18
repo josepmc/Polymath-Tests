@@ -14,7 +14,7 @@
         "test": "npm run protractor -- protractor.conf.travis.js"
     },
     "dependencies": {
-        "@josepmc/protractor": "^5.2.0-6",
+        "@josepmc/protractor": "^5.4.0-1",
         "@types/chai": "^4.0.4",
         "@types/chai-as-promised": "7.1.0",
         "@types/chance": "^0.7.35",
@@ -37,6 +37,7 @@
         "@types/unzipper": "^0.8.4",
         "@types/yargs": "^11.1.1",
         "app-module-path": "^2.2.0",
+        "cbt_tunnels": "^0.9.6",
         "chai": "^4.1.2",
         "chai-as-promised": "^7.1.1",
         "chance": "^1.0.11",

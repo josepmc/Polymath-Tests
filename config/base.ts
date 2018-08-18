@@ -5,6 +5,10 @@ import { ExtensionManager, ExtensionBrowser, ExtensionData, ExtensionInfo, Exten
 import * as deasync from 'deasync';
 import { readFileSync } from 'fs';
 import { LocalDownloadManager } from './download/local';
+import { assert } from 'framework/helpers';
+import { CloudDownloadManager } from 'config/download/cloud';
+import cbt = require('cbt_tunnels');
+let localhost = 'localhost';
 
 process.on('uncaughtException', function (err) {
     console.error((err && err.stack) ? err.stack : err);
@@ -14,34 +18,38 @@ process.on('uncaughtException', function (err) {
 class Environment {
     public argv: Arguments = BaseArguments;
     public config: RunnerConfig;
-    constructor(private opts = {}) {
+    constructor(private opts = { params: {} }) {
         this.argv = {
-            params: {},
             ...opts,
-            ...this.argv
+            ...this.argv,
+            params: {
+                ...(opts && opts.params),
+                ...(this.argv && this.argv).params
+            },
         }
     }
 }
-
-const environments: { [k: string]: RunnerConfig } = {
-    local: {
-        baseUrl: 'http://localhost:3000',
-        emailConfig: {
-            user: process.env.GMAIL_USER,
-            password: process.env.GMAIL_PASSWORD,
-            host: "imap.gmail.com",
-            port: 993,
-            tls: true
-        }
-    },
-    production: {
-        baseUrl: 'https://tokenstudio.polymath.network',
-        emailConfig: {
-            user: process.env.GMAIL_USER,
-            password: process.env.GMAIL_PASSWORD,
-            host: "imap.gmail.com",
-            port: 993,
-            tls: true
+const environments = function (): { [k: string]: RunnerConfig } {
+    return {
+        local: {
+            baseUrl: `http://${localhost}:3000`,
+            emailConfig: {
+                user: process.env.GMAIL_USER,
+                password: process.env.GMAIL_PASSWORD,
+                host: "imap.gmail.com",
+                port: 993,
+                tls: true
+            }
+        },
+        production: {
+            baseUrl: 'https://tokenstudio.polymath.network',
+            emailConfig: {
+                user: process.env.GMAIL_USER,
+                password: process.env.GMAIL_PASSWORD,
+                host: "imap.gmail.com",
+                port: 993,
+                tls: true
+            }
         }
     }
 }
@@ -71,11 +79,11 @@ const getExtensions = function (env: string[], browser: ExtensionBrowser): { inf
     return res;
 }
 
-export = (opts = {}) => {
+export = (opts = { params: {} }) => {
     try {
         let currentEnv = new Environment(opts);
         currentEnv.config = {
-            allScriptsTimeout: 60 * 3600,
+            allScriptsTimeout: 60 * 60 * 1000,
             specs: ['tests/**/*.feature'],
             SELENIUM_PROMISE_MANAGER: false,
             disableChecks: true,
@@ -84,6 +92,7 @@ export = (opts = {}) => {
             ignoreUncaughtExceptions: true,
             framework: 'custom',
             frameworkPath: require.resolve('protractor-cucumber-framework'),
+            localhost: localhost,
             cucumberOpts: {
                 //compiler: "ts:ts-node/register",
                 require: [
@@ -98,7 +107,7 @@ export = (opts = {}) => {
             },
             extensions: {
             },
-            beforeLaunch: async function () {
+            beforeLaunch: function () {
                 require('./register');
             },
             afterLaunch: async function () {
@@ -108,7 +117,7 @@ export = (opts = {}) => {
                 ...currentEnv.argv.params,
                 generatorSeed: currentEnv.argv.seed || (Math.random() * Number.MAX_SAFE_INTEGER),
             },
-            ...environments[currentEnv.argv.env || 'local']
+            ...environments()[currentEnv.argv.env || 'local']
         };
         switch ((currentEnv.argv.params.browser && currentEnv.argv.params.browser.toLowerCase()) || 'puppeteer') {
             case 'puppeteer': {
@@ -226,6 +235,64 @@ export = (opts = {}) => {
                     },
                     browserName: 'safari',
                     //TODO: Implement metamask support
+                }
+                break;
+            }
+            case 'cloud': {
+                assert(process.env.CBT_USER, `Crossbrowsertesting user is not defined`);
+                assert(process.env.CBT_KEY, `Crossbrowsertesting key is not defined`);
+                /*let input = ['win,10,chrome,65'];
+                if (currentEnv.argv.params.bsbrowser) {
+                    if (currentEnv.argv.params.bsbrowser instanceof Array) {
+                        input = currentEnv.argv.params.bsbrowser;
+                    }
+                    else input = (currentEnv.argv.params.bsbrowser as string).split(';');
+                }
+                let browsers = input.map(b => {
+                    let components = b.split(',');
+                    return {
+                        os: components[0], os_version: components[1],
+                        browser: components[2], browser_version: components[3]
+                    };
+                });*/
+                // In crossbrowsertesting, our 'localhost' is 'local'
+                localhost = 'local';
+                let extensions = getExtensions(currentEnv.argv.params.extensions, ExtensionBrowser.Chrome);
+                let dlmgr = new CloudDownloadManager();
+                let ext = {};
+                for (let ex of extensions) ext[ex.config.key] = ex.config.config;
+                let oldBefore = currentEnv.config.beforeLaunch;
+                let oldAfter = currentEnv.config.afterLaunch;
+                currentEnv.config = {
+                    ...currentEnv.config,
+                    // Add again the environments as localhost changed
+                    ...environments()[currentEnv.argv.env || 'local'],
+                    localhost: localhost,
+                    beforeLaunch: function () {
+                        oldBefore();
+                        deasync(callback => cbt.start({
+                            "username": process.env.CBT_USER,
+                            "authkey": process.env.CBT_KEY
+                        }, callback))();
+                    },
+                    afterLaunch: async function (exitCode: number) {
+                        await oldAfter(exitCode);
+                        await cbt.stop();
+                    },
+                    seleniumAddress: `http://${process.env.CBT_USER}:${process.env.CBT_KEY}@hub.crossbrowsertesting.com/wd/hub`,
+                    extraConfig: {
+                        downloadManager: dlmgr.getConfig(),
+                        extensions: ext
+                    },
+                    capabilities: {
+                        browserName: 'chrome',
+                        platform: 'Windows 10',
+                        version: '68.0',
+                        record_video: true,
+                        chromeOptions: {
+                            extensions: extensions.map(ex => readFileSync(ex.data.file, 'base64')),
+                        },
+                    }
                 }
                 break;
             }

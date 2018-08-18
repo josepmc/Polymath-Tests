@@ -1,4 +1,4 @@
-import { Settings } from ".";
+import { Settings, SettingsPage } from ".";
 import { Locator, By, oh } from "framework/helpers";
 import { injectable } from "framework/object/core/iConstructor";
 import { Locked } from "../../pages/locked";
@@ -12,7 +12,7 @@ import { Locked } from "../../pages/locked";
         await oh.wait(oh.clickable(loc), `Settings: Timeout waiting for the lock button to appear`);
         return oh.click(loc).then(() => lookForNext && Locked.WaitForPage<Locked>(Locked));
     }
-    public async settings(lookForNext: boolean = true): Promise<void> { }
+    public async settings(lookForNext: boolean = true): Promise<SettingsPage> { return null; }
     public async info(lookForNext: boolean = true): Promise<void> { }
     public async beta(lookForNext: boolean = true): Promise<void> { }
 }

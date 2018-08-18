@@ -9,4 +9,5 @@ export interface RunnerConfig extends ProtractorConfig {
         extensions?: { [k: string]: Object };
         downloadManager?: DownloadConfig;
     };
+    localhost?: string;
 }

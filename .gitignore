@@ -4,4 +4,4 @@ polymath2.png
 .env
 .DS_Store
 .todo
-yarn-error.log
+*.log

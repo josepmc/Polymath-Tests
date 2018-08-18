@@ -7,7 +7,10 @@ process.on('uncaughtException', function (err) {
     debugger;
 });
 
-setDefaultTimeout(60 * 3600);
+// For process.exit file removal, when having a lot of files
+require('events').EventEmitter.defaultMaxListeners = 100;
+
+setDefaultTimeout(60 * 60 * 1000);
 
 // TODO: Build nice reporting
 
@@ -17,7 +20,7 @@ let find = function (en: Object, name: string): string {
 }
 
 let first = true;
-Before(async function (this: World, scenario: HookScenarioResult) {
+Before({ timeout: 60 * 60 * 1000 }, async function (this: World, scenario: HookScenarioResult) {
     // TODO: Make this browser independent
     // TODO: Implement automatic startup
     if (first) first = false;

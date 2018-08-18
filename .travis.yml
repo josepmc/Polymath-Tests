@@ -11,7 +11,7 @@ before_install:
   - START_TIME=$(date +%s)
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.7.0
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s --
   - export PATH="$HOME/.yarn/bin:$PATH"
 
 install: yarn
@@ -25,18 +25,25 @@ before_script:
     fi
   - |
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
+      PROJECT_PATH="$(pwd)"
+      MIGRATION_LOG="$PROJECT_PATH/migration.log"
+      GANACHE_LOG="$PROJECT_PATH/ganache.log"
+    GANACHE_DB="/tmp/ganache.db"
+      export GANACHE_PORT=8080
       git clone --depth=1 --branch=master https://github.com/PolymathNetwork/polymath-core.git polymath-core
       cd polymath-core
       nvm install v8
       npm install -g truffle
       npm install
-      ganache-cli -i $GANACHE_NETWORK -l 9000000 -m "$METAMASK_SECRET" > ../ganache.log &
+      rm -rf "$GANACHE_PORT"
+      mkdir -p "$GANACHE_PORT"
+      ganache-cli -i $GANACHE_NETWORK -l 9000000 -m "$METAMASK_SECRET" --db "$GANACHE_DB" -p $GANACHE_PORT &> "$GANACHE_LOG" &
       GANACHE_PID=$!
-      sh -c 'tail -n +0 -f ../ganache.log | { sed "/Listening on/ q" && kill $$ ;}'
-      export GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee migration.log | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
-      cat migration.log
+      sh -c 'tail -n +0 -f "$GANACHE_LOG" | { sed "/Listening on/ q" && kill $$ ;}'
+      export GANACHE_CONTRACTS="{"$(truffle migrate --reset --all --network development | tee "$MIGRATION_LOG" | sed  -e "1,/^Using network \'.*\'.$/ d; /----- Polymath Core Contracts -----/,\$d; /^[^:]*$/ d; /^.*\.js$/ d; s/^ *\([^:]*\): *\([^ ]*\) *$/ \"\1\" : { \"$GANACHE_NETWORK\" : \"\2\" }/g" | tr '\n' ', ' | sed 's/,$//')" }"
+      cat "$MIGRATION_LOG"
       nvm use v10
-      cd ..
+      cd "$PROJECT_PATH"
     fi
 
 script: npm test -- --env=production --params.tags=@status
@@ -45,7 +52,7 @@ after_script:
   - |
     if [ "${GANACHE_PID+x}" ]; then
       kill -9 $GANACHE_PID
-      cat ganache.log
+      cat "$GANACHE_LOG"
     fi
   - |
     END_TIME=$(date +%s)

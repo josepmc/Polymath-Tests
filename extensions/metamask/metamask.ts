@@ -1,4 +1,4 @@
-import { oh, WindowInfo, RunnerConfig } from "framework/helpers";
+import { oh, WindowInfo, RunnerConfig, TestConfig } from "framework/helpers";
 import { ExtensionManager, Extension } from "../extensionManager";
 import { MetamaskDownloader } from "./browsers";
 import { MetamaskOptions, Network } from "./shared";
@@ -97,7 +97,16 @@ export class Metamask extends Extension {
     public async switchNetwork(network: Network = Network.Main) {
         await this.navigateToPage();
         let page = await MetamaskPage.WaitForPage<MetamaskPage>(MetamaskPage).then(p => p.init({ mode: InitMode.OnlyObjects }));
-        await page.network.next(network);
+        let local = TestConfig.instance.protractorConfig.localhost;
+        let port = process.env.GANACHE_PORT;
+        if ((local || port) && network === Network.Localhost) {
+            local = local || 'localhost';
+            port = port || '8584';
+            let settings = await page.settings.settings();
+            settings.customRpc = `http://${local}:${port}`;
+            await settings.apply();
+            await settings.next();
+        } else await page.network.next(network);
         await this.exitPage();
     }
 
