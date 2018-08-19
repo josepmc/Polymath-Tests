@@ -29,7 +29,7 @@ before_script:
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
       PROJECT_PATH="$(pwd)"
       MIGRATION_LOG="$PROJECT_PATH/migration.log"
-      GANACHE_LOG="$PROJECT_PATH/ganache.log"
+      export GANACHE_LOG="$PROJECT_PATH/ganache.log"
       GANACHE_DB="/tmp/ganache.db"
       export GANACHE_PORT=8080
       export GANACHE_GAS=9000000
