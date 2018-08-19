@@ -103,7 +103,7 @@ export = (opts = { params: {} }) => {
                     './tests/**/*.ts',
                 ],
                 tags: currentEnv.argv.params.tags || '',
-                format: 'progress'
+                format: 'node_modules/cucumber-pretty'
             },
             extensions: {
             },
