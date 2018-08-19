@@ -14,7 +14,7 @@ before_install:
   - |
     export RECORDED_FILE="$(pwd)/recorded.mp4"
     coproc ffmpeg -f x11grab -video_size 1920x1080 -i :0 -codec:v libx264 -r 60 "$RECORDED_FILE" &
-    export $COPROC
+    export COPR=$COPROC
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s --
   - export PATH="$HOME/.yarn/bin:$PATH"
 
@@ -62,7 +62,7 @@ after_script:
       cat "$GANACHE_LOG"
     fi
   - |
-    echo 'q' >&"${COPROC[1]}"
+    echo 'q' >&"${COPR[1]}"
     # Upload video somewhere
   - |
     END_TIME=$(date +%s)
