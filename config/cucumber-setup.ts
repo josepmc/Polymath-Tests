@@ -27,14 +27,17 @@ Before({ timeout: 60 * 60 * 1000 }, async function (this: World, scenario: HookS
     else await oh.restart();
     let secret = process.env.METAMASK_SECRET;
     if (!secret) throw `Missing metamask secret! You need to add the environment variable 'METAMASK_SECRET' for the tests to work`;
+    console.log('DEBUG: Importing metamask account');
     await Metamask.instance.importAccount(secret);
+    console.log('DEBUG: Switching network');
     await Metamask.instance.switchNetwork(Network[find(Network, process.env.METAMASK_NETWORK)] || Network.Kovan);
+    console.log('DEBUG: Switching account');
     if (process.env.METAMASK_ACCOUNT_NUMBER)
         for (let i = 1; i < parseInt(process.env.METAMASK_ACCOUNT_NUMBER); ++i)
             await Metamask.instance.switchAccount();
     let info = await Metamask.instance.accountInfo();
     console.log(`INFO: Using '${info.name}' (${info.ethAddress}) with ${info.ethAmount} ETH`);
-
+    console.log('DEBUG: Closing extra windows');
     let def = await oh.browser.defaultFrame(true);
     let all = await oh.browser.getAllWindowHandles();
     let handles = all.filter(h => def.windowHandle != h);
