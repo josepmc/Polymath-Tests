@@ -91,7 +91,7 @@ export class PuppeteerHandle {
                 callback(null, res);
             }).catch(err => {
                 console.log(`Pupeteer: Trying to start browser ${tries + 1}/${tries}`);
-                if (tries < 10) return fn();
+                if (tries++ < 10) return fn();
                 else callback(err);
             });
             fn();
