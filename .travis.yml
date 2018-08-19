@@ -11,8 +11,10 @@ before_install:
   - START_TIME=$(date +%s)
   - "export DISPLAY=:99.0"
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x24+32"
-  - RECORDED_FILE="$(pwd)/recorded.mp4"
-  - coproc ffmpeg -f x11grab -video_size 1920x1080 -i :0 -codec:v libx264 -r 5 "$RECORDED_FILE" &
+  - |
+    export RECORDED_FILE="$(pwd)/recorded.mp4"
+    coproc ffmpeg -f x11grab -video_size 1920x1080 -i :0 -codec:v libx264 -r 60 "$RECORDED_FILE" &
+    export $COPROC
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s --
   - export PATH="$HOME/.yarn/bin:$PATH"
 
