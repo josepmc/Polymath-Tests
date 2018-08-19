@@ -9,6 +9,7 @@ import { assert } from 'framework/helpers';
 import { CloudDownloadManager } from 'config/download/cloud';
 import cbt = require('cbt_tunnels');
 let localhost = 'localhost';
+const debugMode = process.env.IS_DEBUG;
 
 process.on('uncaughtException', function (err) {
     console.error((err && err.stack) ? err.stack : err);
@@ -83,7 +84,7 @@ export = (opts = { params: {} }) => {
     try {
         let currentEnv = new Environment(opts);
         currentEnv.config = {
-            allScriptsTimeout: 60 * 60 * 1000,
+            allScriptsTimeout: debugMode ? 60 * 60 * 1000 : 2 * 60 * 1000,
             specs: ['tests/**/*.feature'],
             SELENIUM_PROMISE_MANAGER: false,
             disableChecks: true,

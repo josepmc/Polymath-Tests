@@ -1,6 +1,7 @@
 import { After, HookScenarioResult, World, Status, setDefaultTimeout, Before } from 'cucumber';
 import { oh, WindowInfo } from 'framework/helpers';
 import { Metamask, Network } from 'extensions/metamask';
+const debugMode = process.env.IS_DEBUG;
 
 process.on('uncaughtException', function (err) {
     console.error((err && err.stack) ? err.stack : err);
@@ -10,7 +11,7 @@ process.on('uncaughtException', function (err) {
 // For process.exit file removal, when having a lot of files
 require('events').EventEmitter.defaultMaxListeners = 100;
 
-setDefaultTimeout(60 * 60 * 1000);
+setDefaultTimeout(debugMode ? 60 * 60 * 1000 : 5 * 60 * 1000);
 
 // TODO: Build nice reporting
 
@@ -20,7 +21,7 @@ let find = function (en: Object, name: string): string {
 }
 
 let first = true;
-Before({ timeout: 60 * 60 * 1000 }, async function (this: World, scenario: HookScenarioResult) {
+Before({ timeout: debugMode ? 60 * 60 * 1000 : 5 * 60 * 1000 }, async function (this: World, scenario: HookScenarioResult) {
     // TODO: Make this browser independent
     // TODO: Implement automatic startup
     if (first) first = false;
