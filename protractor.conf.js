@@ -1,10 +1,12 @@
 let baseConfig = require('./config/register')({
-    env: 'local'
+    env: 'local',
+    browser: 'puppeteer'
 });
 
 exports.config = {
     ...baseConfig.config,
     specs: [
-        'tests/compliance/compliance.feature'
+        'tests/ticker/reserve.feature',
+        //'tests/compliance/complianceSanity.feature'
     ],
 }

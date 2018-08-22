@@ -6,7 +6,7 @@ interface Wallet {
 }
 
 export class EthAddress {
-    public static prefix: string = 'FAB';
+    public static prefix: string = '';
     public address: string;
     public privKey: string;
     constructor(public wallet: Wallet) {

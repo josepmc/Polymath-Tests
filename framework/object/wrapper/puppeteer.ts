@@ -12,10 +12,10 @@ const puppeteer: {
 import deasync = require('deasync');
 import { randomBytes } from 'crypto';
 import { ISize } from 'selenium-webdriver';
-import * as tmp from 'tmp';
 import * as rimraf from 'rimraf';
 import { ProtractorBrowser } from 'protractor';
 import { DownloadManager } from 'config/download/abstract';
+import { tmpDir } from '../../tmp';
 
 export interface PuppeteerOptions {
     headless?: boolean;
@@ -97,7 +97,7 @@ export class PuppeteerHandle {
             fn();
         })();
     }
-    private tmpDirHandle: tmp.SynchrounousResult;
+    private tmpDirHandle: string;
     public constructor(public options: PuppeteerOptions = { headless: false }) {
         if (!this.options.launchArgs)
             this.options.launchArgs = [
@@ -111,8 +111,8 @@ export class PuppeteerHandle {
                 '--test-type=webdriver'
             ];
         if (!this.options.userDataDir) {
-            this.tmpDirHandle = tmp.dirSync({ prefix: 'puppeteer' });
-            this.options.userDataDir = this.tmpDirHandle.name;
+            this.tmpDirHandle = tmpDir({ prefix: 'puppeteer' });
+            this.options.userDataDir = this.tmpDirHandle;
         }
         if (!this.options.headless && !this.options.launchArgs.find(arg => arg.startsWith('--start-fullscreen'))) {
             this.options.launchArgs.push('--start-fullscreen');
@@ -162,7 +162,7 @@ export class PuppeteerHandle {
             this.didQuit = true;
             await this.browser.close();
             if (this.tmpDirHandle) {
-                rimraf.sync(this.tmpDirHandle.name);
+                rimraf.sync(this.tmpDirHandle);
             }
             PuppeteerHandle.registeredInstances.splice(PuppeteerHandle.registeredInstances.findIndex(el => el === this), 1);
         }
@@ -171,10 +171,10 @@ export class PuppeteerHandle {
         await this.browser.close();
         if (newUserDir) {
             if (this.tmpDirHandle) {
-                rimraf.sync(this.tmpDirHandle.name);
+                rimraf.sync(this.tmpDirHandle);
             }
-            this.tmpDirHandle = tmp.dirSync({ prefix: 'puppeteer' });
-            this.options.userDataDir = this.tmpDirHandle.name;
+            this.tmpDirHandle = tmpDir({ prefix: 'puppeteer' });
+            this.options.userDataDir = this.tmpDirHandle;
         }
         let idx = this.options.launchArgs.findIndex(el => el.startsWith('--remote-debugging-port'));
         if (idx > 0) this.options.launchArgs.splice(idx, 1);

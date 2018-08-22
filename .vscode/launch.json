@@ -12,8 +12,12 @@
             "args": [
                 "${workspaceFolder}/protractor.conf.js",
                 "--troubleshoot",
+                //"--params.tags=@sanity or @status"
+                //"--params.tags=@sanity",
                 "--params.browser=puppeteer",
-                "--params.extensions=metamask"
+                //"--params.browser=cloud",
+                //"--params.browser=chrome",
+                //"--params.extensions=metamask"
             ],
             // Define here your environment variables (e.g. metamask secret & password)
             "envFile": "${workspaceFolder}/.env",
@@ -22,7 +26,10 @@
             "skipFiles": [
                 "node_modules/**/*",
                 "<node_internals>/**/*"
-            ]
+            ],
+            "env": {
+                "IS_DEBUG": "true"
+            }
         }
     ]
 }

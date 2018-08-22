@@ -1,5 +1,5 @@
 import { After, HookScenarioResult, World, Status, setDefaultTimeout, Before } from 'cucumber';
-import { oh, WindowInfo } from 'framework/helpers';
+import { oh, WindowInfo, By } from 'framework/helpers';
 import { Metamask, Network } from 'extensions/metamask';
 const debugMode = process.env.IS_DEBUG;
 
@@ -57,8 +57,20 @@ Before({ timeout: debugMode ? 60 * 60 * 1000 : 5 * 60 * 1000 }, async function (
 After(async function (this: World, scenario: HookScenarioResult) {
     if (scenario.result.status === Status.FAILED) {
         // Take screenshot and attach it to the test
-        let base64 = await oh.browser.takeScreenshot();
-        //this.attach(base64, 'image/png');
+        switch (process.env.FAIL_LOG || 'image') {
+            case 'image':
+                try {
+                    let base64 = await oh.browser.takeScreenshot();
+                    await this.attach(base64, 'image/png');
+                    break;
+                }
+                catch (error) {
+                    console.error(`Error attach: Can't take screenshot. Error: ${JSON.stringify(error)})`);
+                }
+            case 'console':
+                console.log(await oh.browser.getPageSource());
+                break;
+        }
     }
     // If we restart here we risk a node instakill
 });

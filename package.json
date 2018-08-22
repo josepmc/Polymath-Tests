@@ -56,6 +56,7 @@
         "mailparser": "^2.3.2",
         "mime-types": "^2.1.17",
         "moment": "^2.18.1",
+        "mongoose": "^5.2.9",
         "node-rsa": "^1.0.1",
         "parse-domain": "^1.2.0",
         "protractor-cucumber-framework": "^6.0.0",

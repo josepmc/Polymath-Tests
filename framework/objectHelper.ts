@@ -130,7 +130,7 @@ export class ObjectHelper {
                 }
             }
             debugger;
-            assert(!err, `Click: An error occurred for ${selector && (selector instanceof ElementFinder ? selector.locator() : selector['value'])}: ${err}`);
+            if (err) throw `Click: An error occurred for ${selector && (selector instanceof ElementFinder ? selector.locator() : selector['value'])}: ${err}`;
         } finally {
             if (resetCache) this.browser.resetCache(keepIframe);
         }

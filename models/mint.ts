@@ -1,8 +1,7 @@
 import { IDataModelObject } from "framework/object/core";
-import { oh, NumberRange } from "framework/helpers";
+import { oh, NumberRange, tmpFile } from "framework/helpers";
 import { ComplianceItem } from "models/whitelistModel";
 import * as csv from 'csvtojson';
-import * as tmp from 'tmp';
 import * as fs from 'fs';
 
 
@@ -37,8 +36,8 @@ export class MintData extends IDataModelObject {
         return this.addresses.map(item => item.toCSV()).join('\n');
     }
     public toFile(): string {
-        let file = tmp.fileSync({ prefix: 'compliance-', postfix: '.csv' });
-        fs.writeFileSync(file.fd, this.toCSV());
-        return file.name;
+        let file = tmpFile({ prefix: 'compliance-', postfix: '.csv' });
+        fs.writeFileSync(file, this.toCSV());
+        return file;
     }
 }

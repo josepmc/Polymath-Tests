@@ -1,8 +1,7 @@
 import { IDataModelObject } from "framework/object/core";
-import { oh, assert } from "framework/helpers";
+import { oh, assert, tmpFile } from "framework/helpers";
 import { EthAddress } from "models/ethGenerator";
 import * as csv from 'csvtojson';
-import * as tmp from 'tmp';
 import * as fs from 'fs';
 
 
@@ -47,9 +46,9 @@ export class ComplianceData extends IDataModelObject {
         return this.addresses.map(item => item.toCSV()).join('\n');
     }
     public toFile(): string {
-        let file = tmp.fileSync({ prefix: 'compliance-', postfix: '.csv' });
-        fs.writeFileSync(file.fd, this.toCSV());
-        return file.name;
+        let file = tmpFile({ prefix: 'compliance-', postfix: '.csv' });
+        fs.writeFileSync(file, this.toCSV());
+        return file;
     }
 }
 

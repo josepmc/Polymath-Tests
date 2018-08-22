@@ -1,13 +1,8 @@
 import { DownloadManager, DownloadedFile, DownloadConfig } from "./abstract";
-import * as tmp from 'tmp';
-import { sync as rmdir } from 'rimraf';
 import { sync as glob } from 'glob';
 import * as fs from 'fs';
 import * as path from 'path';
-
-enum FileStatus {
-    Modified, NoFile, Created, Deleted
-}
+import { tmpDir } from "framework/helpers";
 
 export class LocalDownloadManager extends DownloadManager {
     public static UUID: string = 'LOCAL_DOWNLOAD_MANAGER';
@@ -27,10 +22,7 @@ export class LocalDownloadManager extends DownloadManager {
     }
 
     public generateDownloadPath(): string {
-        this._downloadPath = tmp.dirSync().name;
-        process.on('exit', () => {
-            rmdir(this._downloadPath);
-        });
+        this._downloadPath = tmpDir();
         return this._downloadPath;
     }
     public downloadPath(): string {

@@ -1,10 +1,9 @@
 import * as fs from 'fs';
 import * as gm from 'gm';
-import { assert, oh } from '../helpers';
+import { assert, oh, tmpFile } from '../helpers';
 import mime = require('mime-types');
 import * as path from 'path';
 import { ElementFinder, WebElement } from 'protractor';
-import * as tmp from 'tmp';
 const imgToCanvas = require('./injectors/imgToCanvas');
 const xpath = require('./injectors/xpath');
 
@@ -90,7 +89,7 @@ export abstract class AbstractPhoto {
   }
 
   public async uid(): Promise<string> {
-    return await this.element.getOuterHtml();
+    return await oh.html(this.element);
   }
 
   public async getElementXPath(): Promise<string> {
@@ -150,14 +149,14 @@ export abstract class AbstractPhoto {
   }
 
   protected static async compareCanvas(aPhoto: AbstractPhoto, bPhoto: AbstractPhoto): Promise<boolean> {
-    let aFile = tmp.fileSync({ postfix: '.' + mime.extension((await aPhoto.size()).extension) });
-    fs.writeFileSync(aFile.name, await aPhoto.canvas());
-    let bFile = tmp.fileSync({ postfix: '.' + mime.extension((await bPhoto.size()).extension) });
-    fs.writeFileSync(bFile.name, await bPhoto.canvas());
+    let aFile = tmpFile({ postfix: '.' + mime.extension((await aPhoto.size()).extension) });
+    fs.writeFileSync(aFile, await aPhoto.canvas());
+    let bFile = tmpFile({ postfix: '.' + mime.extension((await bPhoto.size()).extension) });
+    fs.writeFileSync(bFile, await bPhoto.canvas());
     return await new Promise<boolean>(async (resolve, reject) => {
-      return gm.compare(aFile.name, bFile.name, { tolerance: 0.4 }, (err, isEqual, equality, raw) => {
-        aFile.removeCallback();
-        bFile.removeCallback();
+      return gm.compare(aFile, bFile, { tolerance: 0.4 }, (err, isEqual, equality, raw) => {
+        fs.unlinkSync(aFile);
+        fs.unlinkSync(bFile);
         assert(!err, `Error: Comparing ${aPhoto} with ${bPhoto} failed ${err}`);
         // 5% difference margin
         resolve(equality < 0.05);
