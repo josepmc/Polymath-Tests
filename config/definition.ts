@@ -4,6 +4,7 @@ import { DownloadConfig } from "./download/abstract";
 
 export interface RunnerConfig extends ProtractorConfig {
     emailConfig?: EmailSettings;
+    dbConfig?: { mongo?: string };
     extraConfig?: {
         [k: string]: Object;
         extensions?: { [k: string]: Object };

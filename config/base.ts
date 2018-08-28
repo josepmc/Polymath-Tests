@@ -40,6 +40,9 @@ const environments = function (): { [k: string]: RunnerConfig } {
                 host: "imap.gmail.com",
                 port: 993,
                 tls: true
+            },
+            dbConfig: {
+                mongo: process.env.mongo ||  "mongodb://localhost:27017/"
             }
         },
         production: {
@@ -136,7 +139,7 @@ export = (opts = { params: {} }) => {
                 currentEnv.config.capabilities = {
                     directConnect: true,
                     extraConfig: {
-                        extensions: ext,
+                        //extensions: ext,
                         downloadManager: dlmgr.getConfig(),
                     },
                     browserName: 'chrome',

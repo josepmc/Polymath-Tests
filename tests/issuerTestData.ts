@@ -6,6 +6,7 @@ import { EmailHandler } from "helpers/email";
 import { TestConfig } from "framework/helpers";
 import { WhitelistModel } from "models/whitelistModel";
 import { MintData } from "models/mint";
+import { Notice } from "objects/features/general/notice";
 
 // Defines a Token and all the related information
 export class IssuerTestData {
@@ -29,4 +30,6 @@ export class IssuerTestData {
 
     public mint: MintData = new MintData();
     public whitelist: WhitelistModel = new WhitelistModel();
+
+    public notice?: Notice;
 }
