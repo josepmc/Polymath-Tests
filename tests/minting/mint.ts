@@ -1,5 +1,5 @@
 import { binding, given, then } from "cucumber-tsflow";
-import { IssuerTest } from "tests/issuerTest";
+import { TransactionalTest } from "tests/issuerTest";
 import { IssuerTestData } from "tests/issuerTestData";
 import { MintPage } from "objects/pages/withToken/token/mint";
 import { expect } from "framework/helpers";
@@ -9,7 +9,7 @@ import { join } from "path";
 import { EthAddress } from "models/ethGenerator";
 
 @binding([IssuerTestData])
-class MintToken extends IssuerTest {
+class MintToken extends TransactionalTest {
     private page: MintPage;
     @given(/The issuer adds minting data( with default data)?/)
     public async startNewMinting(defaultData?: string) {
@@ -48,6 +48,7 @@ class MintToken extends IssuerTest {
         let file = await this.page.tokenInfo.download();
         let data = await MintData.fromCsv(file.contents);
         let eq = await data.equals(this.data.mint);
+        if (!eq) debugger;
         expect(eq, 'Minting data is not the same as uploaded').to.be.true;
     }
 

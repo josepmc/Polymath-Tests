@@ -10,13 +10,12 @@ import { inputField } from "framework/object/core/decorators";
 
 @injectable export class NewSettingsFakeMenu extends Settings {
     protected featureSelector: Locator = By.xpath('.//*[@class="account-menu__icon"]');
-    private account: NewAccountManager = new NewAccountManager();
     public async lock(lookForNext: boolean = true): Promise<Locked> {
-        await this.account.waitForMenu();
+        await new NewAccountManager().waitForMenu();
         return oh.click(By.xpath('.//*[@class="account-menu__logout-button"]')).then(() => lookForNext && Locked.WaitForPage<Locked>(Locked));
     }
     public async settings(lookForNext: boolean = true): Promise<SettingsPage> {
-        await this.account.waitForMenu();
+        await new NewAccountManager().waitForMenu();
         await oh.click(By.xpath('.//*[contains(@class, "menu__item--clickable")]/div[text()="Settings"]'));
         return lookForNext && new NewSettingsPage().load();
     }

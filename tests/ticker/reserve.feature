@@ -1,4 +1,4 @@
-@reserve @sanity
+@issuer @reserve @sanity
 Feature: Reserve a token test
     This is the test related to the reserve a token Feature
 

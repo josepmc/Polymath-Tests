@@ -14,5 +14,5 @@ import { label, NumberParseMethod, LabelOptsMode } from "framework/object/core/d
             mode: LabelOptsMode.Text
         }) public ethAmount: number;
     @label<string>(By.xpath('.//div[@class="flex-row"][preceding-sibling::*[@class="name-label"]]/div'),
-        null, { mode: LabelOptsMode.Text }) public ethAddress: string;
+        null, { mode: LabelOptsMode.Text, numberParseMethod: NumberParseMethod.None }) public ethAddress: string;
 }

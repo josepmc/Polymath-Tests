@@ -1,8 +1,8 @@
 import { Locator, By } from "framework/helpers";
 import { injectable } from "framework/object/core/iConstructor";
-import { CorePage } from "objects/pages/base";
+import { IssuerPage } from "objects/pages/base";
 
 // TODO: Fix these locators
-@injectable export class NotFound extends CorePage {
+@injectable export class NotFound extends IssuerPage {
     protected featureSelector: Locator = By.xpath('.//body[.//h3[text()="Segmentation Fault! – Just kidding it\'s only a 404 – Page Not Found"]]');
 }

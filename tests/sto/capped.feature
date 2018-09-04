@@ -1,4 +1,4 @@
-@sto @sanity
+@issuer @sto @sanity
 Feature: Capped STO test
     This is the test related to the start a token STO Feature
 

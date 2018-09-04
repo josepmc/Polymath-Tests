@@ -12,7 +12,7 @@ const puppeteer: {
 import deasync = require('deasync');
 import { randomBytes } from 'crypto';
 import { ISize } from 'selenium-webdriver';
-import * as rimraf from 'rimraf';
+import * as fs from 'fs-extra';
 import { ProtractorBrowser } from 'protractor';
 import { DownloadManager } from 'config/download/abstract';
 import { tmpDir } from '../../tmp';
@@ -162,7 +162,7 @@ export class PuppeteerHandle {
             this.didQuit = true;
             await this.browser.close();
             if (this.tmpDirHandle) {
-                rimraf.sync(this.tmpDirHandle);
+                fs.removeSync(this.tmpDirHandle);
             }
             PuppeteerHandle.registeredInstances.splice(PuppeteerHandle.registeredInstances.findIndex(el => el === this), 1);
         }
@@ -171,7 +171,7 @@ export class PuppeteerHandle {
         await this.browser.close();
         if (newUserDir) {
             if (this.tmpDirHandle) {
-                rimraf.sync(this.tmpDirHandle);
+                fs.removeSync(this.tmpDirHandle);
             }
             this.tmpDirHandle = tmpDir({ prefix: 'puppeteer' });
             this.options.userDataDir = this.tmpDirHandle;

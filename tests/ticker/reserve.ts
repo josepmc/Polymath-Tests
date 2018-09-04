@@ -2,7 +2,7 @@ import { binding, given, then } from "cucumber-tsflow";
 import { IssuerTestData } from "tests/issuerTestData";
 import { expect, TestConfig } from "framework/helpers";
 import { Ticker } from "objects/pages/noToken/ticker/ticker";
-import { CorePage } from "objects/pages/base";
+import { IssuerPage } from "objects/pages/base";
 import { PageWithToken } from "objects/pages/withToken/base";
 import { Modal } from "objects/features/general/modal";
 import { TickerError } from "objects/features/ticker/ticker";
@@ -26,8 +26,8 @@ class ReserveToken extends AccountCreation {
 
     @then(/The issuer has the token reserved/)
     public async tokenIsReserved() {
-        let page = await CorePage.Get(CorePage);
-        //expect(page).to.be.instanceof(PageWithToken);
+        let page = await PageWithToken.WaitForPage(PageWithToken);
+        expect(page).to.be.instanceof(PageWithToken);
     }
 
     @given(/A token is reserved/)

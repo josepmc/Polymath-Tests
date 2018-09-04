@@ -1,4 +1,4 @@
-@create @sanity
+@issuer @create @sanity
 Feature: Create a token test
     This is the test related to the create a token Feature
 

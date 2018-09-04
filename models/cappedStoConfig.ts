@@ -25,4 +25,12 @@ export class CappedStoConfigModel extends IDataModelObject {
     public hardCap: number = oh.chance.natural({ min: 1 });
     public rate: number = oh.chance.natural({ max: this.hardCap });
     public ethAddress: string = EthAddress.Generate().address;
+    public static startNow(model: CappedStoConfigModel): CappedStoConfigModel {
+        let currentDate = moment().add(12, 'm');
+        // Minimum: +10 mins, we give 2 as margin
+        model.startDate = currentDate.format('MM/DD/YYYY');
+        model.startTime = currentDate.format('hh:mm');
+        model.startTimeAmPm = AmPm[currentDate.format('A')];
+        return model;
+    }
 }

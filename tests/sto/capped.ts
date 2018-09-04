@@ -2,13 +2,13 @@ import { binding, given, then } from "cucumber-tsflow";
 import { StoSelector } from "objects/pages/withToken/sto/selector";
 import { CappedSto, CappedStoConfig } from "objects/features/sto/capped";
 import { expect } from "framework/helpers";
-import { IssuerTest } from "tests/issuerTest";
+import { TransactionalTest } from "tests/issuerTest";
 import { IssuerTestData } from "tests/issuerTestData";
 import { StoCountdown } from "objects/pages/withToken/sto/stoCountdown";
-import { CorePage } from "objects/pages/base";
+import { CappedStoConfigModel } from "models/cappedStoConfig";
 
 @binding([IssuerTestData])
-class STOToken extends IssuerTest {
+class STOToken extends TransactionalTest {
     @given(/The issuer selects the a Capped STO/)
     public async stoSelection() {
         let selector = await new StoSelector().navigation.navigate(StoSelector);
@@ -19,8 +19,9 @@ class STOToken extends IssuerTest {
     }
 
     @given(/The issuer configures and starts the Capped STO/)
-    public async configureSTO() {
+    public async configureSTO(immediate?: string) {
         let config: CappedStoConfig = await CappedStoConfig.Get(CappedStoConfig) as CappedStoConfig;
+        if (immediate) CappedStoConfigModel.startNow(this.data.stoConfig);
         await config.fill(this.data.stoConfig);
         await this.approveTransactions(() => config.next()); // Here we need to jump through the transactions...
     }
@@ -31,10 +32,10 @@ class STOToken extends IssuerTest {
         expect(page).to.be.instanceof(StoCountdown);
     }
 
-    @given(/Capped STO launched/)
-    public async createAToken() {
+    @given(/Capped STO launched( immediately)?/)
+    public async createAToken(immediate?: string) {
         await this.stoSelection();
-        await this.configureSTO();
+        await this.configureSTO(immediate);
         await this.stoIsStarted();
     }
 }

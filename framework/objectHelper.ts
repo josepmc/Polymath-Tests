@@ -81,7 +81,7 @@ export class ObjectHelper {
 
     public async by(selector: Locator | WebElement | ElementWrapper,
         parent?: Locator | WebElement | ElementWrapper, wait: boolean = true): Promise<ElementWrapper> {
-        return this.browser.by(selector, parent, wait);
+        return await this.browser.by(selector, parent, wait);
     }
 
     public async all(selector: Locator | ElementWrapper, parent?: Locator | WebElement | ElementWrapper): Promise<ElementWrapper[]> {
@@ -169,7 +169,7 @@ export class ObjectHelper {
 
     public async uncheck(selector: Locator | ElementWrapper,
         parent?: Locator | ElementWrapper): Promise<void> {
-        return this.check(selector, parent, false);
+        return await this.check(selector, parent, false);
     }
 
     public async checked(selector: Locator | ElementWrapper,
@@ -179,7 +179,7 @@ export class ObjectHelper {
 
     public async value(selector: Locator | ElementWrapper,
         parent?: Locator | ElementWrapper): Promise<string> {
-        return this.attribute(selector, 'value', parent);
+        return await this.attribute(selector, 'value', parent);
     }
 
     /**
@@ -326,16 +326,16 @@ export class ObjectHelper {
     }
 
     public async back(): Promise<void> {
-        return this.browser.back();
+        return await this.browser.back();
     }
 
     public async get(destination: string, timeout: number = this.browser.allScriptsTimeout) {
-        await this.browser.get(destination, timeout);
+        return await this.browser.get(destination, timeout);
     }
 
     public async wait<T>(untilCondition: () => T | Promise<T> | ProtractorPromise.Promise<T> | Function,
         text: string, timeout: number = this.browser.allScriptsTimeout, throwAfterTimeout: boolean = true): Promise<T> {
-        return this.browser.waitFor(untilCondition, text, timeout, throwAfterTimeout);
+        return await this.browser.waitFor(untilCondition, text, timeout, throwAfterTimeout);
     }
 
     private async sendKeysWithDelay(el: ElementWrapper, text: string | number, pauseAfterChar: number = 50): Promise<void> {
@@ -371,7 +371,7 @@ export class ObjectHelper {
     }
 
     public async html(elem: Locator | ElementWrapper | WebElement, parent?: Locator | ElementWrapper | WebElement): Promise<string> {
-        return (await this.by(elem, parent)).getHtml();
+        return await (await this.by(elem, parent)).getHtml();
     }
 
     public async loadSaved<T>(key: StoreObject<T>, fun: () => Promise<T>): Promise<T> {
@@ -383,13 +383,13 @@ export class ObjectHelper {
 export class Alert {
     constructor(private oh: ObjectHelper) { }
     public async accept(): Promise<void> {
-        await this.oh.browser.switchTo().alert().accept();
+        return await this.oh.browser.switchTo().alert().accept();
     }
     public async cancel(): Promise<void> {
-        await this.oh.browser.switchTo().alert().dismiss();
+        return await this.oh.browser.switchTo().alert().dismiss();
     }
     public async authenticate(username: string, password: string): Promise<void> {
-        await this.oh.browser.switchTo().alert().authenticateAs(username, password);
+        return await this.oh.browser.switchTo().alert().authenticateAs(username, password);
     }
     public async setText(text: string): Promise<this> {
         await this.oh.browser.switchTo().alert().sendKeys(text);
@@ -401,10 +401,10 @@ export class Alert {
     public get present(): Promise<boolean> {
         return this.text().then(() => true, error => false);
     }
-    public waitForAlert(): Promise<this> {
-        return this.oh.wait(() => this.present, `Alert - Timeout! Waiting for alert to be present`).then(() => this);
+    public async waitForAlert(): Promise<this> {
+        return await this.oh.wait(() => this.present, `Alert - Timeout! Waiting for alert to be present`).then(() => this);
     }
-    public processAlert(accept: boolean): Promise<void> {
-        return this.waitForAlert().then(() => accept ? this.accept() : this.cancel());
+    public async processAlert(accept: boolean): Promise<void> {
+        return await this.waitForAlert().then(() => accept ? this.accept() : this.cancel());
     }
 }

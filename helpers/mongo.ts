@@ -1,6 +1,7 @@
 import { oh, TestConfig, assert } from 'framework/helpers';
 import * as mongoose from 'mongoose';
 import * as deasync from 'deasync';
+import { IDataModelObject } from 'framework/object/core';
 
 export enum NoticeType {
     error, warning, info
@@ -19,11 +20,11 @@ const NoticeSchema = {
     isValid: Boolean,
 }
 
-export class NoticeOpts {
+export class NoticeModel extends IDataModelObject {
     public type: NoticeType = oh.chance.pickOneEnum(NoticeType);
     public scope: Scope = Scope.all;
-    public title: string = oh.chance.string();
-    public content: string = oh.chance.string();
+    public title: string = oh.chance.string({ length: 25 });
+    public content: string = oh.chance.string({ length: 125 });
     public isOneTime: boolean = false;
     public isValid: boolean = true;
     public get mongo() {
@@ -62,7 +63,7 @@ export class Mongo {
         await this.notice.deleteMany({});
         return this;
     }
-    public async addNotice(opts: NoticeOpts): Promise<mongoose.Document> {
+    public async addNotice(opts: NoticeModel): Promise<mongoose.Document> {
         if (!this.connection) await this.connect();
         return await this.notice.create(opts.mongo);
     }

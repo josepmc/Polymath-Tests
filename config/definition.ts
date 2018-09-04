@@ -11,4 +11,7 @@ export interface RunnerConfig extends ProtractorConfig {
         downloadManager?: DownloadConfig;
     };
     localhost?: string;
+    apps?: {
+        investor?: string;
+    };
 }

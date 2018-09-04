@@ -1,4 +1,4 @@
-@mint @full
+@issuer @mint @full
 Feature: Mint test
     This is the test related to the mint a token Feature
 

@@ -3,7 +3,7 @@ import { Locator, By, oh, ElementWrapper } from "framework/helpers";
 import { injectable } from "framework/object/core/iConstructor";
 import { Import } from "../../pages/account/import";
 import { Detail } from "../../pages/account/detail";
-import { label, inputField } from "framework/object/core/decorators";
+import { label, inputField, LabelOptsMode } from "framework/object/core/decorators";
 import { MetamaskPage } from "../../pages";
 
 @injectable export class AccountCreate extends MetamaskPage {
@@ -12,19 +12,27 @@ import { MetamaskPage } from "../../pages";
     public async import(lookForNext: boolean = true): Promise<Import> { return null; }
     public async connect(lookForNext: boolean = true): Promise<Import> { return null; }
     public next(lookForNext: boolean = true): Promise<Detail> {
-        return oh.click(By.xpath('.//button'), this.element)
+        return oh.click(By.xpath('.//button[contains(@class, "btn-primary")]'), this.element)
             .then(() => lookForNext && Detail.WaitForPage<Detail>(Detail));
     }
 }
 
 @injectable export class NewAccountManager extends AccountManager {
     protected featureSelector: Locator = By.xpath('.//*[@class="account-menu__icon"]');
-    @label<string[]>(By.xpath('.//*[contains(@class, "account-menu__account")]')) public accounts: string[];
-    public async create(lookForNext: boolean = true, skipAccountCreation: boolean = true): Promise<Detail | AccountCreate> {
+    @label<string[]>(By.xpath('//*[contains(@class, "account-menu__name")]'),
+        null,
+        {
+            mode: LabelOptsMode.Text,
+            alwaysArray: true,
+            preGet: async function () { await this.target.waitForMenu(); },
+            postGet: async function () { await oh.click(By.xpath('.//*[@class="menu__close-area"]')); }
+        }
+    ) public accounts: string[];
+    public async create(lookForNext: boolean = true, accountCreation: boolean = true): Promise<Detail | AccountCreate> {
         await this.waitForMenu();
         let el = await oh.by(By.xpath('.//*[@class="menu__item__text"][text()="Create Account"]'));
         await this.click(el);
-        if (skipAccountCreation) {
+        if (accountCreation) {
             let create = await AccountCreate.WaitForPage<AccountCreate>(AccountCreate);
             return create.next(lookForNext);
         }

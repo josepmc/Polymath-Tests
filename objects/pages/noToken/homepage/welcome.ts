@@ -1,9 +1,9 @@
 import { Locator, oh, By } from "framework/helpers";
 import { injectable } from "framework/object/core/iConstructor";
-import { CorePage } from "objects/pages/base";
+import { IssuerPage } from "objects/pages/base";
 import { SignPage } from "objects/pages/noToken/sign/sign";
 
-@injectable export class Welcome extends CorePage {
+@injectable export class Welcome extends IssuerPage {
     protected featureSelector: Locator = By.xpath('.//body[.//button[text()="CREATE YOUR SECURITY TOKEN"]]');
     constructor() {
         super(oh.browser.baseUrl);

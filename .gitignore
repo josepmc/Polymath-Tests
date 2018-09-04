@@ -5,3 +5,5 @@ polymath2.png
 .DS_Store
 .todo
 *.log
+tmp
+reports

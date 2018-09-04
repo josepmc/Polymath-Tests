@@ -55,7 +55,7 @@ export function fillWith(targetProperty: string) {
 }
 
 export enum NumberParseMethod {
-    ParseInt, Number, ParseFloat, None
+    ParseInt, ParseIntWithCommas, Number, ParseFloat, None
 }
 
 export interface CallOpts {
@@ -79,6 +79,8 @@ function parseNumber(value: string, parseMethod: NumberParseMethod): number {
         default:
         case NumberParseMethod.ParseInt:
             return parseInt(value.replace(/\./g, ''));
+        case NumberParseMethod.ParseIntWithCommas:
+            return parseInt(value.replace(/,/g, ''));
         case NumberParseMethod.ParseFloat:
             return parseFloat(value);
         case NumberParseMethod.Number:
@@ -195,6 +197,7 @@ export enum LabelOptsMode {
 export interface LabelOpts extends CallOpts {
     mode?: LabelOptsMode;
     matchNo?: number;
+    alwaysArray?: boolean;
 }
 
 async function parseText<T extends string | number | string[] | number[] | Date | Date[]>(els: string[], regex: RegExp, opts: LabelOpts, locator: Locator): Promise<T> {
@@ -225,7 +228,7 @@ async function parseText<T extends string | number | string[] | number[] | Date 
         if (!isNaN(number)) numbers.push(number);
     }
     let retArray = (texts.length === dates.length && opts.dateFormat) ? dates : (texts.length === numbers.length) ? numbers : texts;
-    if (retArray.length === 1) return retArray[0] as T;
+    if (retArray.length === 1 && !opts.alwaysArray) return retArray[0] as T;
     else if (!retArray.length) return '' as T;
     else return retArray as T;
 }

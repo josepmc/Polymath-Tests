@@ -762,8 +762,8 @@ export class ChromeWrapper extends BrowserWrapper {
             await this.driver.schedule(cmd, 'Set the download strategy for Chrome headless');*/
         }
     }
-    protected static readonly MAX_WIDTH = 1080;
-    protected static readonly MAX_HEIGHT = 1920;
+    protected static readonly MAX_WIDTH = 900;
+    protected static readonly MAX_HEIGHT = 1400;
     // Can't maximize in Headless
     public async maximize(): Promise<void> {
         if (!this.headless) {

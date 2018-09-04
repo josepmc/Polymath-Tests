@@ -22,6 +22,7 @@
             // Define here your environment variables (e.g. metamask secret & password)
             "envFile": "${workspaceFolder}/.env",
             "console": "integratedTerminal",
+            "runtimeVersion": "default",
             "stopOnEntry": false,
             "skipFiles": [
                 "node_modules/**/*",

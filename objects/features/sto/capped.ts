@@ -1,6 +1,6 @@
 import { injectable } from "framework/object/core/iConstructor";
 import { Locator, By, oh } from "framework/helpers";
-import { label, present, inputField, comboBox, ClickMode, LabelOptsMode, order } from "framework/object/core/decorators";
+import { label, present, inputField, comboBox, ClickMode, LabelOptsMode, order, NumberParseMethod } from "framework/object/core/decorators";
 import { StoConfig, StoWidget } from "./abstract";
 import { CappedStoConfigModel, AmPm, RaiseIn } from "models/cappedStoConfig";
 import { Modal } from "objects/features/general/modal";
@@ -28,7 +28,7 @@ import { Modal } from "objects/features/general/modal";
     }, { ignoreNotVisible: true, noEmptyOptionPresent: true }) public raiseIn: RaiseIn;
     @inputField<number>(By.xpath('.//*[@id="cap"]')) public hardCap: number;
     @inputField<number>(By.xpath('.//*[@id="rate"]')) public rate: number;
-    @inputField<string>(By.xpath('.//*[@id="fundsReceiver"]')) public ethAddress: string;
+    @inputField<string>(By.xpath('.//*[@id="fundsReceiver"]'), null, { numberParseMethod: NumberParseMethod.None }) public ethAddress: string;
     @label<number>(By.xpath('.//fieldset'), /(\d+)/, { mode: LabelOptsMode.Text }) public fundsRaised: number;
 
     public next(): Promise<Modal> {

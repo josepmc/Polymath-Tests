@@ -1,0 +1,232 @@
+[
+  {
+    "description": "Navigate to an invalid token page",
+    "assertions": [
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      }
+    ],
+    "events": [
+      {
+        "emitterEvent": "testPass",
+        "name": "Given The investor navigates to an invalid token page",
+        "category": "Invalid Token for Investor: Navigate to an invalid token page",
+        "durationMillis": 18835,
+        "sourceLocation": {
+          "filePath": "tests/investor/nonExisting.feature",
+          "line": 6,
+          "column": 9
+        },
+        "progress": {
+          "step": 1,
+          "steps": 2
+        }
+      },
+      {
+        "emitterEvent": "testPass",
+        "name": "Then The investor is shown an invalid token page",
+        "category": "Invalid Token for Investor: Navigate to an invalid token page",
+        "durationMillis": 1,
+        "sourceLocation": {
+          "filePath": "tests/investor/nonExisting.feature",
+          "line": 7,
+          "column": 9
+        },
+        "progress": {
+          "step": 2,
+          "steps": 2
+        }
+      }
+    ],
+    "emitToTestRunner": [
+      [
+        "testPass",
+        {
+          "name": "Given The investor navigates to an invalid token page",
+          "category": "Invalid Token for Investor: Navigate to an invalid token page",
+          "durationMillis": 18835,
+          "sourceLocation": {
+            "filePath": "tests/investor/nonExisting.feature",
+            "line": 6,
+            "column": 9
+          },
+          "progress": {
+            "step": 1,
+            "steps": 2
+          }
+        }
+      ],
+      [
+        "testPass",
+        {
+          "name": "Then The investor is shown an invalid token page",
+          "category": "Invalid Token for Investor: Navigate to an invalid token page",
+          "durationMillis": 1,
+          "sourceLocation": {
+            "filePath": "tests/investor/nonExisting.feature",
+            "line": 7,
+            "column": 9
+          },
+          "progress": {
+            "step": 2,
+            "steps": 2
+          }
+        }
+      ]
+    ],
+    "duration": 22068
+  },
+  {
+    "description": "Invest in a token",
+    "assertions": [
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": false,
+        "errorMsg": "Minting data is not the same as uploaded: expected false to be true",
+        "stackTrace": "AssertionError: Minting data is not the same as uploaded: expected false to be true\n    at Assertion.<anonymous> (/Users/pasztet/Workspace/poly-tests/node_modules/chai/lib/chai/core/assertions.js:659:10)\n    at Assertion.propertyGetter (/Users/pasztet/Workspace/poly-tests/node_modules/chai/lib/chai/utils/addProperty.js:62:29)\n    at doAsserterAsyncAndAddThen (/Users/pasztet/Workspace/poly-tests/node_modules/chai-as-promised/lib/chai-as-promised.js:289:22)\n    at Assertion.<anonymous> (/Users/pasztet/Workspace/poly-tests/node_modules/chai-as-promised/lib/chai-as-promised.js:280:43)\n    at Assertion.overwritingPropertyGetter (/Users/pasztet/Workspace/poly-tests/node_modules/chai/lib/chai/utils/overwriteProperty.js:79:37)\n    at Object.get (<anonymous>)\n    at Object.proxyGetter [as get] (/Users/pasztet/Workspace/poly-tests/node_modules/chai/lib/chai/utils/proxify.js:86:22)\n    at MintToken.investorsAreMinted (/Users/pasztet/Workspace/poly-tests/tests/minting/mint.ts:54:79)"
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      },
+      {
+        "passed": true
+      }
+    ],
+    "events": [
+      {
+        "emitterEvent": "testPass",
+        "name": "Given The investor selects the account number 2",
+        "category": "Normal invest for an investor: Invest in a token",
+        "durationMillis": 29053,
+        "sourceLocation": {
+          "filePath": "tests/investor/invest.feature",
+          "line": 14,
+          "column": 9
+        },
+        "progress": {
+          "step": 1,
+          "steps": 3
+        }
+      },
+      {
+        "emitterEvent": "testPass",
+        "name": "And The investor navigates to a valid token page",
+        "category": "Normal invest for an investor: Invest in a token",
+        "durationMillis": 1,
+        "sourceLocation": {
+          "filePath": "tests/investor/invest.feature",
+          "line": 15,
+          "column": 9
+        },
+        "progress": {
+          "step": 2,
+          "steps": 3
+        }
+      },
+      {
+        "emitterEvent": "testPass",
+        "name": "Then The investor invests 1 token",
+        "category": "Normal invest for an investor: Invest in a token",
+        "durationMillis": 10072,
+        "sourceLocation": {
+          "filePath": "tests/investor/invest.feature",
+          "line": 16,
+          "column": 9
+        },
+        "progress": {
+          "step": 3,
+          "steps": 3
+        }
+      }
+    ],
+    "emitToTestRunner": [
+      [
+        "testPass",
+        {
+          "name": "Given The investor selects the account number 2",
+          "category": "Normal invest for an investor: Invest in a token",
+          "durationMillis": 29053,
+          "sourceLocation": {
+            "filePath": "tests/investor/invest.feature",
+            "line": 14,
+            "column": 9
+          },
+          "progress": {
+            "step": 1,
+            "steps": 3
+          }
+        }
+      ],
+      [
+        "testPass",
+        {
+          "name": "And The investor navigates to a valid token page",
+          "category": "Normal invest for an investor: Invest in a token",
+          "durationMillis": 1,
+          "sourceLocation": {
+            "filePath": "tests/investor/invest.feature",
+            "line": 15,
+            "column": 9
+          },
+          "progress": {
+            "step": 2,
+            "steps": 3
+          }
+        }
+      ],
+      [
+        "testPass",
+        {
+          "name": "Then The investor invests 1 token",
+          "category": "Normal invest for an investor: Invest in a token",
+          "durationMillis": 10072,
+          "sourceLocation": {
+            "filePath": "tests/investor/invest.feature",
+            "line": 16,
+            "column": 9
+          },
+          "progress": {
+            "step": 3,
+            "steps": 3
+          }
+        }
+      ]
+    ],
+    "duration": null
+  }
+]

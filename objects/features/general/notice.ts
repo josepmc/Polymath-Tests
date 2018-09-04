@@ -1,9 +1,9 @@
 import { AbstractFeature } from "framework/object/abstract";
 import { Locator, By, oh } from "framework/helpers";
-import { NoticeOpts, NoticeType } from "helpers/mongo";
+import { NoticeModel, NoticeType } from "helpers/mongo";
 import { label, present, LabelOptsMode } from "framework/object/core/decorators";
 
-export class Notice extends AbstractFeature implements NoticeOpts {
+export class NoticeFeature extends AbstractFeature implements NoticeModel {
     protected featureSelector: Locator = By.xpath('.//*[@class="pui-navbar pui-navbar-notice"]');
     @label<string>(By.xpath('.//*[@class="pui-notice-bar-title"]'), null, { mode: LabelOptsMode.Text }) public title: string;
     @present(By.xpath('self::*'), {

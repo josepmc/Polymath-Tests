@@ -3,9 +3,9 @@ import { oh, assert, tmpFile } from "framework/helpers";
 import { EthAddress } from "models/ethGenerator";
 import * as csv from 'csvtojson';
 import * as fs from 'fs';
+import * as moment from 'moment';
 
-
-export class ComplianceItem extends IDataModelObject {
+export abstract class SharedComplianceItem extends IDataModelObject {
     public ethAddress: string;
     public sellLockup: string;
     public buyLockup: string;
@@ -20,13 +20,37 @@ export class ComplianceItem extends IDataModelObject {
         this.kyc = baseObject['KYC/AML Expiry'] || oh.chance.date({ american: true });
     }
     public toCSV(): string {
-        return `${this.ethAddress},${this.sellLockup},${this.buyLockup},${this.kyc}`;
+        return `${this.ethAddress},${this.sellLockup || ''},${this.buyLockup || ''},${this.kyc || ''}`;
     }
-    public static async fromCsv(this: { new(...args): ComplianceItem }, text: string | Object): Promise<ComplianceItem> {
+    public static async fromCsv(this: { new(...args): SharedComplianceItem }, text: string | Object): Promise<SharedComplianceItem> {
         if (text instanceof Object) return new this(text);
         let result = await csv().fromString(text);
         assert(result.length === 1, `ComplianceItem - Couldn't parse CSV ${text}`);
         return new this(result[0]);
+    }
+}
+
+export class ComplianceItem extends SharedComplianceItem {
+    public canBuyFromSto: boolean;
+    public exemptFromOwnership: boolean;
+    constructor(baseObject?: Object, nullable?: boolean) {
+        super(baseObject, nullable);
+        baseObject = baseObject || {};
+        this.canBuyFromSto = baseObject['Can Buy From STO'] || true;
+        this.exemptFromOwnership = baseObject['Exempt From % Ownership'] || true;
+    }
+    public static async fromCsv(text: string | Object): Promise<ComplianceItem> {
+        return SharedComplianceItem.fromCsv.call(ComplianceItem, text);
+    }
+    public toCSV(): string {
+        return `${super.toCSV()},${this.canBuyFromSto},${this.exemptFromOwnership}`;
+    }
+    public static fromAddress(address: string): ComplianceItem {
+        let item = new ComplianceItem();
+        item.sellLockup = item.buyLockup = null;
+        item.kyc = oh.chance.date({ year: oh.chance.natural({ min: moment().year() + 1, max: 5000 }), american: true });
+        item.ethAddress = address;
+        return item;
     }
 }
 
@@ -35,6 +59,9 @@ export class ComplianceData extends IDataModelObject {
     public static async fromCsv(text: string): Promise<ComplianceData> {
         let res = await csv().fromString(text);
         return new ComplianceData({ addresses: await Promise.all(res.map(r => ComplianceItem.fromCsv(r))) });
+    }
+    public static fromAddresses(text: string[]): ComplianceData {
+        return new ComplianceData({ addresses: text.map(ComplianceItem.fromAddress) });
     }
     constructor(baseObject?: Object, nullable?: boolean) {
         super(baseObject, nullable);
