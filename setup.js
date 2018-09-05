@@ -94,11 +94,11 @@ const setup = {
         removeSync(ganacheDb);
         mkdirpSync(ganacheDb);
         execSync(`perl -0777 -pe "s/(development: {[^}]*})/development: { host: 'localhost', network_id: '${process.env.GANACHE_NETWORK}', port: ${process.env.GANACHE_PORT}, gas: ${process.env.GANACHE_GAS} }/" -i truffle.js`, { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh"; ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}"`, { cwd: folder });
-        let log = createWriteStream(logs.ganache);
-        pid.stdout.write = pid.stderr.write = log.write.bind(log);
+        console.log('Waiting for ganache to be available...');
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}" | tee "${logs.ganache}"`, { cwd: folder });
         await new Promise((r, e) => {
             let waitForInput = function (data) {
+                console.log(data);
                 if (data.indexOf('Listening on') !== -1) {
                     pid.stdout.removeListener('data', waitForInput);
                     r();
@@ -124,9 +124,7 @@ const setup = {
         else folder = sources.offchain.url;
         try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3001 yarn start`, { cwd: folder });
-        let log = createWriteStream(logs.offchain);
-        pid.stdout.write = pid.stderr.write = log.write.bind(log);
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3001 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.offchain = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Offchain started with pid ${pid.pid}`);
@@ -143,9 +141,7 @@ const setup = {
         }
         try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start`, { cwd: folder });
-        let log = createWriteStream(logs.issuer);
-        pid.stdout.write = pid.stderr.write = log.write.bind(log);
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.issuer = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Issuer started with pid ${pid.pid}`);
@@ -161,9 +157,7 @@ const setup = {
         }
         try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start`, { cwd: folder });
-        let log = createWriteStream(logs.investor);
-        pid.stdout.write = pid.stderr.write = log.write.bind(log);
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.investor = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Investor started with pid ${pid.pid}`);
