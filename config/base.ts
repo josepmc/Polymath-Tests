@@ -184,7 +184,7 @@ export = (opts = { params: {} }) => {
                 currentEnv.config.capabilities = {
                     directConnect: true,
                     extraConfig: {
-                        //extensions: ext,
+                        extensions: ext,
                         downloadManager: dlmgr.getConfig(),
                     },
                     browserName: 'chrome',

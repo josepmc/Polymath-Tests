@@ -1,7 +1,7 @@
 exports.config = require('./config/register')({
     env: 'local',
     params: {
-        browser: 'chrome',
+        browser: 'puppeteer',
         extensions: 'metamask',
         tags: '@sanity or @status'
     }
