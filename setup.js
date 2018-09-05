@@ -56,8 +56,8 @@ let logs = {
 let pids = {};
 let branch = process.env.BRANCH || 'master';
 const setNodeVersion = () => {
-    execSync(`unset npm_config_prefix; source $HOME/.bashrc; nvm install v8`, { cwd: checkoutDir, stdio: 'inherit', shell: '/bin/bash' });
-    return execSync(`unset npm_config_prefix; source $HOME/.bashrc &> /dev/null; nvm use v8 &> /dev/null; echo $PATH`, { cwd: checkoutDir, shell: '/bin/bash' }).toString();
+    execSync(`unset npm_config_prefix; source $HOME/.bashrc; source $NVM_DIR/nvm.sh; nvm install v8`, { cwd: checkoutDir, stdio: 'inherit', shell: '/bin/bash' });
+    return execSync(`unset npm_config_prefix; source $HOME/.bashrc &> /dev/null; source $NVM_DIR/nvm.sh; nvm use v8 &> /dev/null; echo $PATH`, { cwd: checkoutDir, shell: '/bin/bash' }).toString();
 }
 
 const setup = {
