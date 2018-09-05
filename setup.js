@@ -31,6 +31,7 @@ if (!pathExistsSync(process.env.NVM_DIR)) {
     mkdirpSync(process.env.NVM_DIR);
     execSync("curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash", { cwd: checkoutDir, stdio: 'inherit' });
 }
+delete process.env.NPM_CONFIG_PREFIX;
 
 let sources = {
     ganache: {
@@ -88,7 +89,7 @@ const setup = {
             process.env.GANACHE_GAS = 9000000
         }
         if (!process.env.GANACHE_PORT) process.env.GANACHE_PORT = 8545;
-        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; npm install -g truffle', { cwd: folder, stdio: 'inherit' });
         execSync('. "$NVM_DIR/nvm.sh"; npm install', { cwd: folder, stdio: 'inherit' });
         removeSync(ganacheDb);
@@ -122,7 +123,7 @@ const setup = {
         let folder = join(checkoutDir, 'offchain');
         if (!opts.fromDir) this.git(sources.offchain, folder, opts.useNpm);
         else folder = sources.offchain.url;
-        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3001 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.offchain = pid;
@@ -139,7 +140,7 @@ const setup = {
             folder = sources.issuer.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.issuer = pid;
@@ -155,7 +156,7 @@ const setup = {
             folder = sources.investor.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.investor = pid;
