@@ -88,7 +88,7 @@ const setup = {
             process.env.GANACHE_GAS = 9000000
         }
         if (!process.env.GANACHE_PORT) process.env.GANACHE_PORT = 8545;
-        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; npm install -g truffle', { cwd: folder, stdio: 'inherit' });
         execSync('. "$NVM_DIR/nvm.sh"; npm install', { cwd: folder, stdio: 'inherit' });
         removeSync(ganacheDb);
@@ -112,7 +112,7 @@ const setup = {
         pids.ganache = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Migrating contracts...`);
-        let contracts = execSync(`. "$NVM_DIR/nvm.sh" &> /dev/null; echo "{"$(truffle migrate --reset --all --network development | tee "${logs.migration}" | sed  -e "1,/^Using network \\'.*\\'.$/ d; /----- Polymath Core Contracts -----/,\\$d; /^[^:]*$/ d; /^.*\\.js$/ d; s/^ *\\([^:]*\\): *\\([^ ]*\\) *$/ \\"\\1\\" : { \\"${process.env.GANACHE_NETWORK}\\" : \\"\\2\\" }/g" | tr '\\n' ', ' | sed 's/,$//')" }"`, { cwd: folder }).toString();
+        let contracts = execSync(`. "$NVM_DIR/nvm.sh"; echo "{"$(truffle migrate --reset --all --network development | tee "${logs.migration}" | sed  -e "1,/^Using network \\'.*\\'.$/ d; /----- Polymath Core Contracts -----/,\\$d; /^[^:]*$/ d; /^.*\\.js$/ d; s/^ *\\([^:]*\\): *\\([^ ]*\\) *$/ \\"\\1\\" : { \\"${process.env.GANACHE_NETWORK}\\" : \\"\\2\\" }/g" | tr '\\n' ', ' | sed 's/,$//')" }"`, { cwd: folder }).toString();
         process.env.GANACHE_CONTRACTS = contracts;
         console.log(`Ganache started with pid ${pid.pid}`);
     },
@@ -122,7 +122,7 @@ const setup = {
         let folder = join(checkoutDir, 'offchain');
         if (!opts.fromDir) this.git(sources.offchain, folder, opts.useNpm);
         else folder = sources.offchain.url;
-        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3001 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.offchain = pid;
@@ -139,7 +139,7 @@ const setup = {
             folder = sources.issuer.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.issuer = pid;
@@ -155,7 +155,7 @@ const setup = {
             folder = sources.investor.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        try { execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
+        try { execSync('unset npm_config_prefix; . "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' }); } catch (error) { }
         execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
         let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder });
         pids.investor = pid;

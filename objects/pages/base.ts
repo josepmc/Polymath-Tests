@@ -6,6 +6,7 @@ import { NoticeFeature } from "../features/general/notice";
 export abstract class CorePage extends AbstractPage {
     public async navigateToPage(uri?: string): Promise<this> {
         await super.navigateToPage(uri);
+        await CorePage.WaitForPage(CorePage);
         await this.initializeContracts();
         return this;
     }
