@@ -24,7 +24,7 @@ mkdirpSync(checkoutDir);
 let logDir = process.env.LOG_DIR || join(currentDir, 'logs');
 mkdirpSync(logDir);
 let ganacheDb = "/tmp/ganache.db";
-execSync("unset npm_config_prefix; curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash", { cwd: checkoutDir, stdio: 'inherit' });
+execSync("unset npm_config_prefix; curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash", { cwd: checkoutDir, stdio: 'inherit', shell: '/bin/bash' });
 
 let sources = {
     ganache: {
@@ -56,8 +56,8 @@ let logs = {
 let pids = {};
 let branch = process.env.BRANCH || 'master';
 const setNodeVersion = () => {
-    execSync(`unset npm_config_prefix; source $HOME/.bashrc; nvm install v8`, { cwd: checkoutDir, stdio: 'inherit' });
-    return execSync(`unset npm_config_prefix; source $HOME/.bashrc &> /dev/null; nvm use v8 &> /dev/null; echo $PATH`, { cwd: checkoutDir }).toString();
+    execSync(`unset npm_config_prefix; source $HOME/.bashrc; nvm install v8`, { cwd: checkoutDir, stdio: 'inherit', shell: '/bin/bash' });
+    return execSync(`unset npm_config_prefix; source $HOME/.bashrc &> /dev/null; nvm use v8 &> /dev/null; echo $PATH`, { cwd: checkoutDir, shell: '/bin/bash' }).toString();
 }
 
 const setup = {
@@ -65,12 +65,12 @@ const setup = {
         if (!useNpm) {
             // Git mode
             if (!pathExistsSync(dir))
-                execSync(`git clone --depth=1 --branch=${branch} "${source.url}" "${dir}"`, { cwd: checkoutDir, stdio: 'inherit' });
-            else execSync('git pull', { cwd: dir, stdio: 'inherit' });
+                execSync(`git clone --depth=1 --branch=${branch} "${source.url}" "${dir}"`, { cwd: checkoutDir, stdio: 'inherit', shell: '/bin/bash' });
+            else execSync('git pull', { cwd: dir, stdio: 'inherit', shell: '/bin/bash' });
         } else {
             mkdirpSync(dir);
-            execSync(`npm pack ${source.npm}`, { cwd: dir, stdio: 'inherit' });
-            execSync('tar xvf *.tgz --strip-components=1', { cwd: dir, stdio: 'inherit' })
+            execSync(`npm pack ${source.npm}`, { cwd: dir, stdio: 'inherit', shell: '/bin/bash' });
+            execSync('tar xvf *.tgz --strip-components=1', { cwd: dir, stdio: 'inherit', shell: '/bin/bash' })
         }
     },
     ganache: async function (opts) {
@@ -87,13 +87,13 @@ const setup = {
         }
         if (!process.env.GANACHE_PORT) process.env.GANACHE_PORT = 8545;
         let path = setNodeVersion();
-        execSync('npm install -g truffle', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
-        execSync('npm install', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
+        execSync('npm install -g truffle', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
+        execSync('npm install', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         removeSync(ganacheDb);
         mkdirpSync(ganacheDb);
-        execSync(`perl -0777 -pe "s/(development: {[^}]*})/development: { host: 'localhost', network_id: '${process.env.GANACHE_NETWORK}', port: ${process.env.GANACHE_PORT}, gas: ${process.env.GANACHE_GAS} }/" -i truffle.js`, { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
+        execSync(`perl -0777 -pe "s/(development: {[^}]*})/development: { host: 'localhost', network_id: '${process.env.GANACHE_NETWORK}', port: ${process.env.GANACHE_PORT}, gas: ${process.env.GANACHE_GAS} }/" -i truffle.js`, { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         console.log('Waiting for ganache to be available...');
-        let pid = exec(`ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}" | tee "${logs.ganache}"`, { cwd: folder, env: { ...process.env, PATH: path } });
+        let pid = exec(`ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}" | tee "${logs.ganache}"`, { cwd: folder, env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         await new Promise((r, e) => {
             let waitForInput = function (data) {
                 console.log(data);
@@ -110,7 +110,7 @@ const setup = {
         pids.ganache = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Migrating contracts...`);
-        let contracts = "{" + execSync(`truffle migrate --reset --all --network development | tee "${logs.migration}" | sed  -e "1,/^Using network \\'.*\\'.$/ d; /----- Polymath Core Contracts -----/,\\$d; /^[^:]*$/ d; /^.*\\.js$/ d; s/^ *\\([^:]*\\): *\\([^ ]*\\) *$/ \\"\\1\\" : { \\"${process.env.GANACHE_NETWORK}\\" : \\"\\2\\" }/g" | tr '\\n' ', ' | sed 's/,$//'`, { cwd: folder, env: { ...process.env, PATH: path } }).toString() + " }";
+        let contracts = "{" + execSync(`truffle migrate --reset --all --network development | tee "${logs.migration}" | sed  -e "1,/^Using network \\'.*\\'.$/ d; /----- Polymath Core Contracts -----/,\\$d; /^[^:]*$/ d; /^.*\\.js$/ d; s/^ *\\([^:]*\\): *\\([^ ]*\\) *$/ \\"\\1\\" : { \\"${process.env.GANACHE_NETWORK}\\" : \\"\\2\\" }/g" | tr '\\n' ', ' | sed 's/,$//'`, { cwd: folder, env: { ...process.env, PATH: path, shell: '/bin/bash' } }).toString() + " }";
         process.env.GANACHE_CONTRACTS = contracts;
         console.log(`Ganache started with pid ${pid.pid}`);
     },
@@ -121,8 +121,8 @@ const setup = {
         if (!opts.fromDir) this.git(sources.offchain, folder, opts.useNpm);
         else folder = sources.offchain.url;
         let path = setNodeVersion();
-        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
-        let pid = exec(`PORT=3001 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path } });
+        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
+        let pid = exec(`PORT=3001 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         pids.offchain = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Offchain started with pid ${pid.pid}`);
@@ -138,8 +138,8 @@ const setup = {
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
         let path = setNodeVersion();
-        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
-        let pid = exec(`PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path } });
+        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
+        let pid = exec(`PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         pids.issuer = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Issuer started with pid ${pid.pid}`);
@@ -154,8 +154,8 @@ const setup = {
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
         let path = setNodeVersion();
-        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path } });
-        let pid = exec(`PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path } });
+        execSync('yarn', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, shell: '/bin/bash' } });
+        let pid = exec(`PORT=3000 yarn start | tee "${logs.offchain}"`, { cwd: folder, env: { ...process.env, PATH: path, shell: '/bin/bash' } });
         pids.investor = pid;
         writeFileSync(pidsFile, Object.values(pids).map(p => p.pid).join('\n'));
         console.log(`Investor started with pid ${pid.pid}`);
