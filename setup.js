@@ -88,13 +88,13 @@ const setup = {
             process.env.GANACHE_GAS = 9000000
         }
         if (!process.env.GANACHE_PORT) process.env.GANACHE_PORT = 8545;
-        execSync('. "$NVM_DIR/nvm.sh" && nvm install v8', { cwd: folder, stdio: 'inherit' });
-        execSync('. "$NVM_DIR/nvm.sh" && npm install -g truffle', { cwd: folder, stdio: 'inherit' });
-        execSync('. "$NVM_DIR/nvm.sh" && npm install', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; npm install -g truffle', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; npm install', { cwd: folder, stdio: 'inherit' });
         removeSync(ganacheDb);
         mkdirpSync(ganacheDb);
         execSync(`perl -0777 -pe "s/(development: {[^}]*})/development: { host: 'localhost', network_id: '${process.env.GANACHE_NETWORK}', port: ${process.env.GANACHE_PORT}, gas: ${process.env.GANACHE_GAS} }/" -i truffle.js`, { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh" && ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}"`, { cwd: folder });
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; ganache-cli -e 100000 -i ${process.env.GANACHE_NETWORK} -l ${process.env.GANACHE_GAS} --db "${ganacheDb}" -p ${process.env.GANACHE_PORT} -m "${process.env.METAMASK_SECRET}"`, { cwd: folder });
         let log = createWriteStream(logs.ganache);
         pid.stdout.write = pid.stderr.write = log.write.bind(log);
         await new Promise((r, e) => {
@@ -122,9 +122,9 @@ const setup = {
         let folder = join(checkoutDir, 'offchain');
         if (!opts.fromDir) this.git(sources.offchain, folder, opts.useNpm);
         else folder = sources.offchain.url;
-        execSync('. "$NVM_DIR/nvm.sh" && nvm install v8', { cwd: folder, stdio: 'inherit' });
-        execSync('. "$NVM_DIR/nvm.sh" && yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh" && PORT=3001 yarn start`, { cwd: folder });
+        execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3001 yarn start`, { cwd: folder });
         let log = createWriteStream(logs.offchain);
         pid.stdout.write = pid.stderr.write = log.write.bind(log);
         pids.offchain = pid;
@@ -141,9 +141,9 @@ const setup = {
             folder = sources.issuer.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        execSync('. "$NVM_DIR/nvm.sh" && nvm install v8', { cwd: folder, stdio: 'inherit' });
-        execSync('. "$NVM_DIR/nvm.sh" && yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh" && PORT=3000 yarn start`, { cwd: folder });
+        execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start`, { cwd: folder });
         let log = createWriteStream(logs.issuer);
         pid.stdout.write = pid.stderr.write = log.write.bind(log);
         pids.issuer = pid;
@@ -159,9 +159,9 @@ const setup = {
             folder = sources.investor.url;
             sources.ganache.url = join(folder, 'node_modules', 'polymath-core');
         }
-        execSync('. "$NVM_DIR/nvm.sh" && nvm install v8', { cwd: folder, stdio: 'inherit' });
-        execSync('. "$NVM_DIR/nvm.sh" && yarn', { cwd: folder, stdio: 'inherit' });
-        let pid = exec(`. "$NVM_DIR/nvm.sh" && PORT=3000 yarn start`, { cwd: folder });
+        execSync('. "$NVM_DIR/nvm.sh"; nvm install v8', { cwd: folder, stdio: 'inherit' });
+        execSync('. "$NVM_DIR/nvm.sh"; yarn', { cwd: folder, stdio: 'inherit' });
+        let pid = exec(`. "$NVM_DIR/nvm.sh"; PORT=3000 yarn start`, { cwd: folder });
         let log = createWriteStream(logs.investor);
         pid.stdout.write = pid.stderr.write = log.write.bind(log);
         pids.investor = pid;
