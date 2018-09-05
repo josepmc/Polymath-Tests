@@ -22,7 +22,7 @@ install: yarn
 
 before_script:
   - |
-    if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
+    if [[ "${METAMASK_NETWORK:0:1}" = "l"  ]] || [[ -z "${METAMASK_NETWORK+x}" ]]; then
       ARGS="$ARGS --setup.ganache"
     fi
 
