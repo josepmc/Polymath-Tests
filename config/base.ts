@@ -121,7 +121,7 @@ const getExtensions = function (env: string[], browser: ExtensionBrowser): { inf
 export = (opts = { params: {} }) => {
     try {
         let currentEnv = new Environment(opts);
-        if (currentEnv.argv.setup) {
+        if (currentEnv.argv.params && currentEnv.argv.params.setup) {
             process.env.LOCALHOST = localhost;
             let kill = require('../setup');
             shutdownFns.push(async () => {

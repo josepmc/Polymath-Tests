@@ -5,7 +5,7 @@ const { execSync, exec } = require('child_process');
 const deasync = require('deasync');
 const treeKill = require('tree-kill');
 
-if (!argv.setup || !(argv.setup === true || argv.setup instanceof Object)) {
+if (!argv.params || !argv.params.setup || !(argv.params.setup === true || argv.params.setup instanceof Object)) {
     throw `Usage: setup.js [--ganache] [--issuer <path>] [--investor <path>] [--offchain <path>]
     All parameters are mutually exclusive`;
 }
@@ -183,7 +183,7 @@ const setup = {
     }
 }
 
-if (argv.setup.ganache) {
+if (argv.params.setup.ganache) {
     deasync(async function (callback) {
         try {
             await setup.ganache({ fromDir: false, useNpm: true });
@@ -195,9 +195,9 @@ if (argv.setup.ganache) {
 } else {
     let found = false;
     for (let el in sources) {
-        if (argv.setup[el]) {
+        if (argv.params.setup[el]) {
             found = true;
-            sources[el].url = argv.setup[el];
+            sources[el].url = argv.params.setup[el];
             let opts = {};
             opts[el] = { fromDir: true, useNpm: false };
             setup.all(opts);
