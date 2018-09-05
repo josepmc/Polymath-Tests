@@ -2,13 +2,13 @@ import { AbstractFeature, forceVisibility } from "framework/object/abstract";
 import { Locator, By, oh, assert } from "framework/helpers";
 import { Transaction, TransactionResult, Status } from "objects/features/general/transaction";
 import { present } from "framework/object/core/decorators";
-import { IssuerPage } from "objects/pages/base";
+import { CorePage } from "objects/pages/base";
 import { injectable } from "framework/object/core/iConstructor";
 
 export abstract class Modal extends AbstractFeature {
     @present(By.xpath('.//*[@class="bx--modal-close"]')) public hasClose: boolean;
-    public close(): Promise<IssuerPage> {
-        return oh.click(By.xpath('.//button[@class="bx--modal-close"]'), this.element).then(() => IssuerPage.Get(IssuerPage) as Promise<IssuerPage>);
+    public close(lookForNext: boolean = true): Promise<CorePage> {
+        return oh.click(By.xpath('.//button[@class="bx--modal-close"]'), this.element).then(() => lookForNext && CorePage.WaitForPage(CorePage) as Promise<CorePage>);
     }
     public async confirm(noNext: boolean = false): Promise<Transaction | Modal> {
         await oh.click(By.xpath('.//button[contains(@class, "bx--btn--primary")]'), this.element);
@@ -20,8 +20,8 @@ export abstract class Modal extends AbstractFeature {
     public async next(noNext: boolean = false): Promise<Transaction | Modal> {
         return this.confirm(noNext);
     }
-    public cancel(): Promise<IssuerPage> {
-        return oh.click(By.xpath('.//button[contains(@class, "bx--btn--secondary")]'), this.element).then(() => IssuerPage.Get(IssuerPage) as Promise<IssuerPage>);
+    public cancel(lookForNext: boolean = true): Promise<CorePage> {
+        return oh.click(By.xpath('.//button[contains(@class, "bx--btn--secondary")]'), this.element).then(() => lookForNext && CorePage.WaitForPage(CorePage) as Promise<CorePage>);
     }
 }
 

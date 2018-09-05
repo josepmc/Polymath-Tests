@@ -5,8 +5,8 @@ import { Metamask } from "extensions/metamask";
 
 @injectable export class SignPage extends PageWithHeader {
     protected featureSelector: Locator = By.xpath('//body[.//h2[text()="Sign In with Your Wallet"]]');
-    public async next(): Promise<PageWithHeader> {
+    public async next(lookForNext: boolean = true): Promise<PageWithHeader> {
         await Metamask.instance.confirmTransaction();
-        return PageWithHeader.Get(PageWithHeader) as Promise<PageWithHeader>;
+        return lookForNext && PageWithHeader.WaitForPage(PageWithHeader) as Promise<PageWithHeader>;
     }
 }

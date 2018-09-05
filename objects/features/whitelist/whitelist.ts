@@ -10,8 +10,8 @@ import { IssuerPage } from "objects/pages/base";
 class WhitelistModal extends Modal {
     protected featureSelector: Locator = By.xpath('.//*[contains(@class, "whitelist-import-modal") and contains(@class, "is-visible")]');
     @inputField<string>(By.xpath('.//input[@type="file"]')) public file: string;
-    public async cancel(): Promise<IssuerPage> {
-        return oh.click(By.xpath('.//button[contains(@class, "bx--btn--secondary") and not(@for)]'), this.element).then(() => IssuerPage.Get(IssuerPage) as Promise<IssuerPage>);
+    public async cancel(lookForNext: boolean = true): Promise<IssuerPage> {
+        return oh.click(By.xpath('.//button[contains(@class, "bx--btn--secondary") and not(@for)]'), this.element).then(() => lookForNext && IssuerPage.WaitForPage(IssuerPage) as Promise<IssuerPage>);
     }
     public upload(file): Promise<void> {
         return oh.type(By.xpath('.//*[@id="id3"]'), file);

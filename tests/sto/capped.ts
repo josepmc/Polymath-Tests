@@ -20,7 +20,7 @@ class STOToken extends TransactionalTest {
 
     @given(/The issuer configures and starts the Capped STO/)
     public async configureSTO(immediate?: string) {
-        let config: CappedStoConfig = await CappedStoConfig.Get(CappedStoConfig) as CappedStoConfig;
+        let config: CappedStoConfig = await CappedStoConfig.WaitForPage(CappedStoConfig) as CappedStoConfig;
         if (immediate) CappedStoConfigModel.startNow(this.data.stoConfig);
         await config.fill(this.data.stoConfig);
         await this.approveTransactions(() => config.next()); // Here we need to jump through the transactions...

@@ -23,7 +23,7 @@ class CreateTokenTest extends TransactionalTest {
 
     @then(/The issuer has the token created/)
     public async tokenIsCreated() {
-        let page = await MintPage.Get(MintPage);
+        let page = await MintPage.WaitForPage(MintPage);
         expect(page).to.be.instanceof(MintPage);
     }
 

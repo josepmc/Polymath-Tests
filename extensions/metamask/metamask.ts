@@ -74,7 +74,10 @@ export class Metamask extends Extension {
     public async importAccount(seed: string, password = 'password1234') {
         await this.navigateToPage();
         let locked = await Locked.WaitForPage<Locked>([Locked, TermsAndConditions]);
-        if (locked instanceof TermsAndConditions) locked = await locked.skipTou() as Locked;
+        if (locked instanceof TermsAndConditions) {
+            locked = await locked.skipTou() as Locked;
+            locked = await Locked.WaitForPage<Locked>(Locked);
+        }
         await locked.init();
         let page = await locked.import();
         await page.fill({ password: password, seed: seed } as any, false);

@@ -9,7 +9,7 @@ import { expect } from "framework/helpers";
 export class AccountCreation extends TransactionalTest {
     @given(/The issuer creates an account/)
     public async createAnAccount() {
-        let page: AccountPage = await IssuerPage.Get(IssuerPage) as AccountPage;
+        let page: AccountPage = await IssuerPage.WaitForPage(IssuerPage) as AccountPage;
         if (!(page instanceof AccountPage)) {
             console.warn('WARNING: An account already exists for the user, skipping creation.');
             return;

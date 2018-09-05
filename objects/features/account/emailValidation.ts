@@ -31,7 +31,7 @@ export class PinFeature extends AbstractFeature {
         let backupUrl = oh.browser.baseUrl;
         oh.browser.setBaseUrl('');
         await oh.get(`data:text/html,${message}`);
-        let email = await VerificationEmail.Get(VerificationEmail) as VerificationEmail;
+        let email = await VerificationEmail.WaitForPage<VerificationEmail>(VerificationEmail);
         await email.refresh();
         await oh.browser.window().close(previousWindow);
         oh.browser.setBaseUrl(backupUrl);
