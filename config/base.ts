@@ -7,7 +7,6 @@ import { readFileSync } from 'fs';
 import { assert } from 'framework/helpers';
 import { CloudDownloadManager, LocalDownloadManager } from './download';
 import cbt = require('cbt_tunnels');
-import { execSync } from 'child_process';
 import { join } from 'path';
 import { UploadProvider } from './uploadProviders';
 import { mkdirpSync, moveSync } from 'fs-extra';
@@ -72,6 +71,29 @@ const environments = function (): { [k: string]: RunnerConfig } {
 }
 
 let shutdownFns: (() => Promise<void> | void)[] = [];
+let shutdownDone: boolean = false;
+const shutdown = async function () {
+    if (shutdownDone) return true;
+    shutdownDone = true;
+    let hasError = false;
+    for (let fn of shutdownFns) {
+        try {
+            await fn();
+        }
+        catch (error) {
+            hasError = true;
+            console.log(`Error ocurred on shutdown: ${error}`);
+        }
+    }
+    return !hasError;
+}
+
+process.on('exit', () => {
+    if (!shutdownDone) deasync(async function (callback) {
+        callback(!await shutdown());
+    })();
+});
+
 const getExtensions = function (env: string[], browser: ExtensionBrowser): { info: ExtensionInfo, data: ExtensionData, config: ExtensionConfig }[] {
     let res: { info: ExtensionInfo, data: ExtensionData, config: ExtensionConfig }[] = []
     if (env) {
@@ -99,6 +121,13 @@ const getExtensions = function (env: string[], browser: ExtensionBrowser): { inf
 export = (opts = { params: {} }) => {
     try {
         let currentEnv = new Environment(opts);
+        if (currentEnv.argv.setup) {
+            process.env.LOCALHOST = localhost;
+            let kill = require('../setup');
+            shutdownFns.push(async () => {
+                await kill();
+            })
+        }
         currentEnv.config = {
             allScriptsTimeout: debugMode ? 60 * 60 * 1000 : 2 * 60 * 1000,
             specs: ['tests/**/*.feature'],
@@ -125,20 +154,11 @@ export = (opts = { params: {} }) => {
             extensions: {
             },
             beforeLaunch: async function () {
-                if (currentEnv.argv.setup) {
-                    process.env.LOCALHOST = localhost;
-                    execSync(`setup.sh ${currentEnv.argv.setup === true ? "" : currentEnv.argv.setup}`,
-                        { cwd: join(__dirname, '..'), stdio: 'inherit' })
-                }
                 await UploadProvider.init();
             },
             resultJsonOutputFile: join(reportsDir, 'protractor.json'),
             afterLaunch: async function () {
-                for (let fn of shutdownFns) await fn();
-                if (currentEnv.argv.setup) {
-                    execSync(`setup.sh --kill`,
-                        { cwd: join(__dirname, '..'), stdio: 'inherit' })
-                }
+                await shutdown();
                 // Upload to the service providers
                 await UploadProvider.upload(reportsDir);
             },

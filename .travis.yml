@@ -23,10 +23,10 @@ install: yarn
 before_script:
   - |
     if [ "${METAMASK_NETWORK:0:1}" = "l" ]; then
-      ARGS="$ARGS --only-ganache"
+      ARGS="$ARGS --setup.ganache"
     fi
 
-script: npm test -- --env=production --params.tags=@status --setup="$ARGS"
+script: npm test -- --env=production --params.tags=@status "$ARGS"
 
 after_script:
   - |
