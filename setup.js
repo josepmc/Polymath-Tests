@@ -6,6 +6,7 @@ const { execSync, exec } = require('child_process');
 const deasync = require('deasync');
 const treeKill = require('tree-kill');
 let { MongodHelper } = require('@josepmc/mongodb-prebuilt');
+const findProcess = require('find-process');
 
 if (!argv.params || !argv.params.setup || !(argv.params.setup === true || argv.params.setup instanceof Object)) {
     throw `Usage: setup.js [--params.setup.apps=[apps directory]] [--params.setup.ganache]
@@ -27,6 +28,20 @@ if (!process.env.TEST_NO_DELETE_ENV) removeSync(checkoutDir);
 mkdirpSync(checkoutDir);
 let logDir = process.env.TEST_LOG_DIR || resolve(currentDir, 'logs');
 mkdirpSync(logDir);
+
+let findAndKill = port => {
+    deasync(async callback => {
+        let proc = await findProcess('port', port);
+        for (let p of proc)
+            await new Promise((r, e) => {
+                treeKill(p.pid, 'SIGKILL', err => {
+                    if (err) console.log(`Error while killing ${p}: ${err}`);
+                    r();
+                })
+            });
+        callback();
+    })();
+}
 
 let sources = {
     apps: {
@@ -84,6 +99,7 @@ const setup = {
         if (!existsSync(folder))
             throw `Can't find new-polymath-scripts`;
         let path = setNodeVersion();
+        findAndKill(8545);
         if (!process.env.TEST_NO_STARTUP) execSync('yarn --network-timeout=100000', { cwd: folder, stdio: 'inherit', env: { ...process.env, PATH: path, NODE_ENV: 'development' } });
         path = `${resolve(folder, 'node_modules', '.bin')}${charSep}${path}`;
         path = `${resolve(baseOpts, 'node_modules', '.bin')}${charSep}${path}`;
@@ -124,6 +140,8 @@ const setup = {
         let folder = `${baseOpts}/packages/polymath-offchain`;
         let path = setNodeVersion();
         process.env.TEST_MONGO_DIRECTORY = resolve(__dirname, 'mongo');
+        let port = 3001;
+        findAndKill(port);
         let db = resolve(checkoutDir, 'mongo');
         mkdirpSync(db);
         let mongodHelper = new MongodHelper([
@@ -140,7 +158,7 @@ const setup = {
         path = `${resolve(folder, 'node_modules', '.bin')}${charSep}${path}`;
         path = `${resolve(baseOpts, 'node_modules', '.bin')}${charSep}${path}`;
         console.log(`Using path: ${path}`);
-        let pid = exec(`yarn start`, { cwd: folder, env: { ...process.env, PATH: path, PORT: 3001, NODE_ENV: 'development' } });
+        let pid = exec(`yarn start`, { cwd: folder, env: { ...process.env, PATH: path, PORT: port, NODE_ENV: 'development' } });
         let file = createWriteStream(logs.offchain);
         await new Promise((r, e) => {
             let oldWrite = file.write;
@@ -167,7 +185,9 @@ const setup = {
     },
     issuer: async function (baseOpts) {
         console.log('Starting issuer...');
-        let pid = exec(`yarn serve -s "${baseOpts}/packages/polymath-issuer/build"`, { cwd: currentDir, env: { ...process.env, PORT: 3000 } });
+        let port = 3000;
+        findAndKill(port);
+        let pid = exec(`yarn serve -s "${baseOpts}/packages/polymath-issuer/build"`, { cwd: currentDir, env: { ...process.env, PORT: port } });
         let file = createWriteStream(logs.issuer);
         pid.stdout.pipe(file);
         pid.stderr.pipe(file);
@@ -177,7 +197,9 @@ const setup = {
     },
     investor: async function (baseOpts) {
         console.log('Starting investor...');
-        let pid = exec(`yarn serve -s "${baseOpts}/packages/polymath-investor/build"`, { cwd: currentDir, env: { ...process.env, PORT: 3002 } });
+        let port = 3002;
+        findAndKill(port);
+        let pid = exec(`yarn serve -s "${baseOpts}/packages/polymath-investor/build"`, { cwd: currentDir, env: { ...process.env, PORT: port } });
         let file = createWriteStream(logs.investor);
         pid.stdout.pipe(file);
         pid.stderr.pipe(file);
@@ -235,7 +257,7 @@ const kill = () => {
     console.log('Killing processes...');
     for (let proc in pids) {
         try {
-            process.kill(pids[proc].pid, 'SIGKILL');
+            treeKill(pids[proc].pid, 'SIGKILL');
         } catch (error) {
             console.log(`Error while terminating process ${proc}: ${error}`);
         }
